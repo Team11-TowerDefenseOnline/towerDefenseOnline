@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "description": "11조 타워디펜스 온라인 프로젝트",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "node ./src/server.js",
     "migrate": "node ./src/db/migrations/createSchema.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/orgs/Team11-TowerDefenseOnline/repositories"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "migrate": "node src/db/migration/createSchemas.js"
   },
   "author": "",
   "license": "ISC",
