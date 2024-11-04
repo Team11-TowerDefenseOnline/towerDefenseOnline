@@ -1,0 +1,10 @@
+syntax = 'proto3';
+
+package response;
+
+message Response {
+  uint32 handlerId = 1;     // 핸들러 ID (4바이트)
+  uint32 responseCode = 2;  // 응답 코드 (성공: 0, 실패: 에러 코드)
+  uint64 timestamp = 3;     // 보낸 타임스탬프
+  bytes data = 4;           // 보내는 정보
+}
