@@ -14,11 +14,12 @@ export const packetParser = (data) => {
   }
 
   const packetType = packet.packetType;
-  const version = packet.versionLength;
+  const version = packet.version;
   const sequence = packet.sequence;
   const payloadData = packet.payload;
 
   if (version != config.client.version) {
+    console.error(`버전 불일치 client:${version} != server:${config.client.version}`)
     throw Error();
   }
 

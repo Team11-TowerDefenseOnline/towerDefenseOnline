@@ -33,7 +33,8 @@ export const onData = (socket) => async (data) => {
       try {
         const payload = packetParser(payloadData);
         const handler = getHandlerById(packetType);
-        await handler({ socket, payload });
+        
+        handler({ socket, payload });
       } catch (e) {
         console.error(e);
       }

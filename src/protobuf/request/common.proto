@@ -3,11 +3,11 @@ syntax = "proto3";
 package common;
 
 message Packet {
-  ushort packetType = 1;      // 핸들러 ID (4바이트)
-  ubyte versionLength = 2;         // 유저 ID (UUID, 16바이트)
-  string version = 3;  // 클라이언트 버전
-  uint32 sequence = 4;         // 보내는 정보
-  uint32 payloadLength = 5;
+  string packetType = 1;       // 페킷 타입, 핸들러ID (2바이트)
+  string versionLength = 2;      // 버전 데이터 길이 (1바이트)
+  string version = 3;          // 클라이언트 버전 (가변)
+  uint32 sequence = 4;         // 시퀀스 (4바이트)
+  uint32 payloadLength = 5;    // 데이터 길이 (4바이트)
   bytes payload = 6;
 }
 
