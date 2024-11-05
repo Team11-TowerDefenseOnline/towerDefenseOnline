@@ -1,4 +1,4 @@
-import { userSessions } from "./sessions.js";
+import { userSessions } from './sessions.js';
 
 export const addUser = (user) => {
   userSessions.push(user);

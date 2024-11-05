@@ -38,3 +38,10 @@ message S2CLoginResponse {
     string token = 3;
     GlobalFailCode failCode = 4;
 }
+
+enum GlobalFailCode { 
+    NONE = 0; 
+    UNKNOWN_ERROR = 1; 
+    INVALID_REQUEST = 2; 
+    AUTHENTICATION_FAILED = 3; 
+}
