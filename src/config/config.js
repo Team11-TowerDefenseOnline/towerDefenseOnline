@@ -1,12 +1,16 @@
-import { PORT, HOST, CLIENT_VERSION } from '../constants/env.js';
-import { TOTAL_LENGTH, PACKET_TYPE_LENGTH, PACKET_TYPE } from '../constants/header.js';
+import { PORT, HOST, CLIENT_VERSION } from "../constants/env.js";
+import {
+  TOTAL_LENGTH,
+  PACKET_TYPE_LENGTH,
+  PACKET_TYPE,
+} from "../constants/header.js";
 import {
   DB_NAME,
   DB_USER,
   DB_PASSWORD,
   DB_HOST,
-  DB_PORT
-} from '../constants/env.js';
+  DB_PORT,
+} from "../constants/env.js";
 
 export const config = {
   server: {
