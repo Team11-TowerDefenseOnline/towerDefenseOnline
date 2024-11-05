@@ -8,14 +8,11 @@ const registerHandler = async ({socket, payloadData}) => {
     const failCode = protoMessages.common.GlobalFailCode;
     let sendPayload;
 
-    console.log(failCode)
-
-
     try {
         const requestMessage = request.decode(payloadData.subarray(2));
         console.log(requestMessage)
         const {id, password, email} = requestMessage;
-        // createUser(id, password, email);
+        createUser(id, password, email);
         
         sendPayload = {
             success: true, 
@@ -28,14 +25,12 @@ const registerHandler = async ({socket, payloadData}) => {
         sendPayload = {
             success: false, 
             message: "회원가입 실패!", 
-            failCode: 0};
+            failCode: 2};
     }
 
     const response = protoMessages.common.GamePacket;
-    console.log(protoMessages.common)
     // const message = response.create({ registerResponse: sendPayload });
     const packet = response.encode({ registerResponse: sendPayload }).finish();
-    console.log(response.decode(packet))
 
     socket.write(serializer(packet, 2, 1));
 }
