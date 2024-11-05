@@ -1,5 +1,4 @@
 import { config } from '../config/config.js';
-import { PACKET_TYPE } from '../constants/header.js';
 import { packetParser } from '../utils/parser/packetParser.js';
 import { getHandlerById } from '../handler/index.js';
 import { getProtoMessages } from '../init/loadProto.js';
