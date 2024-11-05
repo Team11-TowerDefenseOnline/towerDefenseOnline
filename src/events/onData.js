@@ -31,25 +31,8 @@ export const onData = (socket) => async (data) => {
       socket.buffer = socket.buffer.subarray(requiredLength);
 
       try {
-        switch (packetType) {
-          case PACKET_TYPE.REGISTER_REQUEST: {
-            const protoMessages = getProtoMessages();
-            const Register = protoMessages.common.C2SRegisterRequest;
-            const registerMessage = Register.decode(payloadData.subarray(2));
-            const id = registerMessage.id;
-            const password = registerMessage.password;
-            const email = registerMessage.email;
-
-            console.log(registerMessage);
-            break;
-          }
-          case 0: {
-            const payload = packetParser(payloadData);
-            const handler = getHandlerById(packetType);
-            
-            handler({ socket, payload });
-          }
-        }
+        const handler = getHandlerById(packetType);
+        handler({ socket, payloadData });
       } catch (e) {
         console.error(e);
       }
