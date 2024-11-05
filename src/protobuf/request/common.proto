@@ -3,12 +3,38 @@ syntax = "proto3";
 package common;
 
 message Packet {
-  uint32 handlerId = 1;      // 핸들러 ID (4바이트)
-  string userId = 2;         // 유저 ID (UUID, 16바이트)
-  string clientVersion = 3;  // 클라이언트 버전
-  bytes payload = 4;         // 보내는 정보
+  ushort packetType = 1;      // 핸들러 ID (4바이트)
+  ubyte versionLength = 2;         // 유저 ID (UUID, 16바이트)
+  string version = 3;  // 클라이언트 버전
+  uint32 sequence = 4;         // 보내는 정보
+  uint32 payloadLength = 5;
+  bytes payload = 6;
 }
 
 message Ping {
   int64 timestamp = 1;       // Ping 타임스탬프
+}
+
+message C2SRegisterRequest {
+    string id = 1;
+    string password = 2;
+    string email = 3;
+}
+
+message S2CRegisterResponse {
+    bool success = 1;
+    string message = 2;
+    GlobalFailCode failCode = 3;
+}
+
+message C2SLoginRequest {
+    string id = 1;
+    string password = 2;
+}
+
+message S2CLoginResponse {
+    bool success = 1;
+    string message = 2;
+    string token = 3;
+    GlobalFailCode failCode = 4;
 }
