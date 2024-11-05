@@ -13,7 +13,7 @@ export const serializer = (message, type, sequenceData) => {
   version.write(config.client.version, 0, config.client.version.length);
 
   const sequence = Buffer.alloc(config.packet.sequenceLength);
-  sequence.writeUintBE(sequenceData+1, 0, config.packet.sequenceLength);
+  sequence.writeUintBE(sequenceData, 0, config.packet.sequenceLength);
 
   const payloadLength = Buffer.alloc(config.packet.payloadLength);
   payloadLength.writeUintBE(message.length, 0, config.packet.payloadLength);

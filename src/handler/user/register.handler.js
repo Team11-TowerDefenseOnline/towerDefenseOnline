@@ -5,7 +5,11 @@ import { serializer } from "../../utils/notification/game.notification.js";
 const registerHandler = async ({socket, payloadData}) => {
     const protoMessages = getProtoMessages();
     const request = protoMessages.common.C2SRegisterRequest;
+    const failCode = protoMessages.common.GlobalFailCode;
     let sendPayload;
+
+    console.log(failCode)
+
 
     try {
         const requestMessage = request.decode(payloadData.subarray(2));
@@ -24,12 +28,13 @@ const registerHandler = async ({socket, payloadData}) => {
         sendPayload = {
             success: false, 
             message: "회원가입 실패!", 
-            failCode: 2};
+            failCode: 0};
     }
 
-    const response = protoMessages.common.S2CRegisterResponse;
-    const message = response.create(sendPayload);
-    const packet = response.encode(message).finish();
+    const response = protoMessages.common.GamePacket;
+    console.log(protoMessages.common)
+    // const message = response.create({ registerResponse: sendPayload });
+    const packet = response.encode({ registerResponse: sendPayload }).finish();
     console.log(response.decode(packet))
 
     socket.write(serializer(packet, 2, 1));

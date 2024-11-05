@@ -6,6 +6,7 @@ export const packetNames = {
     S2CRegisterResponse: 'common.S2CRegisterResponse',
     C2SLoginRequest: 'common.C2SLoginRequest',
     S2CLoginResponse: 'common.S2CLoginResponse',
+    GamePacket: 'common.GamePacket'
   },
   response: {
     Response: 'response.Response',
