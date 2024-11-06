@@ -9,8 +9,9 @@ import { createLoginPacket, serializer } from '../../utils/notification/game.not
 import { handleError } from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
-import User from '../../classes/models/user.class.js'
+import User from '../../classes/models/user.class.js';
 import { addUser } from '../../session/user.session.js';
+import { redisClient } from '../../init/redisConnect.js';
 
 // message C2SLoginRequest {
 //     string id = 1;
@@ -48,9 +49,8 @@ const loginHandler = async ({ socket, payloadData }) => {
     }
 
     // 로그인 시점 갱신
-    await updateUserLogin(isExistUserInDB.userId);
+    await updateUserLogin(isExistUserInDB.userId); // jwt 생성
 
-    // jwt 생성
     const token = jwt.sign(
       {
         id: isExistUserInDB.userId,
@@ -67,7 +67,7 @@ const loginHandler = async ({ socket, payloadData }) => {
       failCode: failCode.values.NONE,
     };
 
-    const user = new User(socket, isExistUserInDB.userId)
+    const user = new User(socket, isExistUserInDB.userId, isExistUserInDB.highScore);
     await addUser(user);
     // const response = protoMessages.common.GamePacket;
     // const packet = response.encode({ loginResponse: sendPayload }).finish();
@@ -79,7 +79,7 @@ const loginHandler = async ({ socket, payloadData }) => {
       failCode: failCode.values.INVALID_REQUEST,
     };
 
-    console.error(`${socket} : ${error}`)
+    console.error(`${socket} : ${error}`);
     // handleError(socket, error);
   }
 
