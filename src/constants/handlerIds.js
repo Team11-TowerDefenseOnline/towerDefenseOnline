@@ -4,5 +4,5 @@ export const HANDLER_IDS = {
   INITIAL: 0,
   REGISTER : 1,
   LOGIN: 3,
-  CREATE_GAME: 4,
+  MATCH: 5,
 };

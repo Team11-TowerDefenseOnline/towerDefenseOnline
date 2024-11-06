@@ -9,6 +9,8 @@ import { createLoginPacket, serializer } from '../../utils/notification/game.not
 import { handleError } from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
+import User from '../../classes/models/user.class.js'
+import { addUser } from '../../session/user.session.js';
 
 // message C2SLoginRequest {
 //     string id = 1;
@@ -56,7 +58,7 @@ const loginHandler = async ({ socket, payloadData }) => {
       config.jwt.jwtSecret,
     );
     socket.token = token;
-    // socket.uuid = isExistUserInDB.userId;
+    socket.uuid = isExistUserInDB.userId;
 
     sendPayload = {
       success: true,
@@ -65,11 +67,13 @@ const loginHandler = async ({ socket, payloadData }) => {
       failCode: failCode.values.NONE,
     };
 
+    const user = new User(socket, isExistUserInDB.userId)
+    await addUser(user);
     // const response = protoMessages.common.GamePacket;
     // const packet = response.encode({ loginResponse: sendPayload }).finish();
   } catch (error) {
     sendPayload = {
-      success: true,
+      success: false,
       message: '로그인 실패',
       token: null,
       failCode: failCode.values.INVALID_REQUEST,
