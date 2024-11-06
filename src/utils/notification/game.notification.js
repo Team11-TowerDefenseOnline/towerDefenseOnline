@@ -24,11 +24,11 @@ export const serializer = (message, type, sequenceData) => {
 
 export const createLoginPacket = (payloadData) => {
   const protoMessages = getProtoMessages();
-  const logIn = protoMessages.common.S2CLoginResponse;
+  const logIn = protoMessages.common.GamePacket;
 
   // const payload = { payloadData };
   const message = logIn.create(payloadData);
-  const logInPacket = logIn.encode({ loginResponse: message }).finish();
+  const logInPacket = logIn.encode({ loginResponse: payloadData }).finish();
   // sequence data를 뭘 넣어야 할지 모르겠음 지금으로써는
   return serializer(logInPacket, config.packetType.loginResponse, 1);
 };

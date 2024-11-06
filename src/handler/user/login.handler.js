@@ -35,7 +35,7 @@ const loginHandler = async ({ socket, payloadData }) => {
   try {
     // DB에 user가 있는지 확인
     const isExistUserInDB = await findUserByUserID(id);
-    console.log('isExistUser: ', isExistUser);
+    console.log('isExistUser: ', isExistUserInDB);
     if (!isExistUserInDB) {
       // DB에 해당 유저가 없음
       throw new CustomError(ErrorCodes.USER_NOT_FOUND, 'DB에 해당 유저가 없습니다.');
@@ -71,11 +71,12 @@ const loginHandler = async ({ socket, payloadData }) => {
     sendPayload = {
       success: true,
       message: '로그인 실패',
-      token: token,
+      token: null,
       failCode: failCode.values.INVALID_REQUEST,
     };
 
-    handleError(socket, error);
+    console.error(`${socket} : ${error}`)
+    // handleError(socket, error);
   }
 
   socket.write(createLoginPacket(sendPayload));
