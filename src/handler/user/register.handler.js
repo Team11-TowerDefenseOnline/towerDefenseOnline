@@ -1,6 +1,7 @@
 import { createUser } from "../../db/user/user.db.js";
 import { getProtoMessages } from "../../init/loadProto.js";
 import { serializer } from "../../utils/notification/game.notification.js";
+import bcrypt from 'bcrypt'
 
 const registerHandler = async ({socket, payloadData}) => {
     const protoMessages = getProtoMessages();
@@ -12,7 +13,9 @@ const registerHandler = async ({socket, payloadData}) => {
         const requestMessage = request.decode(payloadData.subarray(2));
         console.log(requestMessage)
         const {id, password, email} = requestMessage;
-        createUser(id, password, email);
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await createUser(id, hashedPassword, email);
         
         sendPayload = {
             success: true, 
