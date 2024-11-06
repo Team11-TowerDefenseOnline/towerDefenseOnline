@@ -11,6 +11,10 @@ const handlers = {
         handler: locationUpdateHandler,
         protoType: 'game.LocationUpdatePayload',
     },
+    [HANDLER_IDS.MONSTERATTACK]: {
+        handler: matchHandler,
+        protoType: 'common.monsterAttackBaseRequest',
+    },
 }
 
 export const getProtoTypeByHandlerId = (handlerId) => {

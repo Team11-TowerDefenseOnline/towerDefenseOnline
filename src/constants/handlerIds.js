@@ -2,6 +2,8 @@ export const RESPONSE_SUCCESS_CODE = 0;
 
 export const HANDLER_IDS = {
   INITIAL: 0,
-  UPDATE_LOCATION: 2,
-  CREATE_GAME: 4,
+  REGISTER : 1,
+  LOGIN: 3,
+  MATCH: 5,
+  MONSTERATTACK: 16,
 };
