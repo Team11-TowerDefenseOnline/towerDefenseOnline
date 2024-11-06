@@ -21,7 +21,7 @@ const matchHandler = async ({ socket, payloadData }) => {
   // 유저 세션 전체 다들고와서 홀수면 gameSession 만들고 아닐 때는 추가만
   const userLength = userSessions.length;
 
-  if (userLength % 2) {
+  if (userLength % 2 && userLength !== 0) {
     // 유저가 홀수 일때
     return;
   } else {

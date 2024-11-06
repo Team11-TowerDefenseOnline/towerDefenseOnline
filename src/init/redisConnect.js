@@ -1,9 +1,13 @@
 import Redis from 'ioredis';
-import dotenv from 'dotenv';
+import { config } from '../config/config.js';
 
-dotenv.config();
-
-export const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+export const redisClient = new Redis({
+  port: config.redis.port, // Redis port
+  host: config.redis.host, // Redis host
+  family: config.redis.family, // 4(IPv4) or 6(IPv6)
+  password: config.redis.password,
+  db: 0,
+});
 
 redisClient.on('error', (err) => console.error('Redis 클라이언트 오류:', err));
 // redisClient.on('connect', () => console.log('Redis에 연결되었습니다.'));
