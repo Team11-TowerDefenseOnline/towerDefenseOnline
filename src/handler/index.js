@@ -1,6 +1,8 @@
 import { HANDLER_IDS } from "../constants/handlerIds.js"
 import locationUpdateHandler from "./game/locationUpdate.handler.js"
+import matchHandler from "./game/match.handler.js"
 import initialHandler from "./user/initial.handler.js"
+import loginHandler from "./user/login.handler.js"
 import registerHandler from "./user/register.handler.js"
 
 const handlers = {
@@ -12,9 +14,13 @@ const handlers = {
         handler: registerHandler,
         protoType : 'common.C2SRegisterRequest'
     },
-    [HANDLER_IDS.UPDATE_LOCATION]: {
-        handler: locationUpdateHandler,
-        protoType: 'game.LocationUpdatePayload',
+    [HANDLER_IDS.LOGIN] : {
+        handler: loginHandler,
+        protoType : 'common.C2SLoginRequest'
+    },
+    [HANDLER_IDS.MATCH]: {
+        handler: matchHandler,
+        protoType: 'common.S2CMatchStartNotification',
     },
 }
 

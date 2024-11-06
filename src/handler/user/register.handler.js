@@ -1,6 +1,7 @@
 import { createUser } from "../../db/user/user.db.js";
 import { getProtoMessages } from "../../init/loadProto.js";
 import { serializer } from "../../utils/notification/game.notification.js";
+import bcrypt from 'bcrypt'
 
 const registerHandler = async ({socket, payloadData}) => {
     const protoMessages = getProtoMessages();
@@ -8,14 +9,13 @@ const registerHandler = async ({socket, payloadData}) => {
     const failCode = protoMessages.common.GlobalFailCode;
     let sendPayload;
 
-    console.log(failCode)
-
-
     try {
         const requestMessage = request.decode(payloadData.subarray(2));
         console.log(requestMessage)
         const {id, password, email} = requestMessage;
-        // createUser(id, password, email);
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await createUser(id, hashedPassword, email);
         
         sendPayload = {
             success: true, 
@@ -28,14 +28,12 @@ const registerHandler = async ({socket, payloadData}) => {
         sendPayload = {
             success: false, 
             message: "회원가입 실패!", 
-            failCode: 0};
+            failCode: 2};
     }
 
     const response = protoMessages.common.GamePacket;
-    console.log(protoMessages.common)
     // const message = response.create({ registerResponse: sendPayload });
     const packet = response.encode({ registerResponse: sendPayload }).finish();
-    console.log(response.decode(packet))
 
     socket.write(serializer(packet, 2, 1));
 }
