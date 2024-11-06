@@ -1,5 +1,5 @@
-import { config } from "../../config/config.js";
-import { getProtoMessages } from "../../init/loadProto.js";
+import { config } from '../../config/config.js';
+import { getProtoMessages } from '../../init/loadProto.js';
 
 export const serializer = (message, type, sequenceData) => {
   // 패킷 타입 정보를 포함한 버퍼 생성
@@ -20,6 +20,17 @@ export const serializer = (message, type, sequenceData) => {
 
   // 길이 정보와 메시지를 함께 전송
   return Buffer.concat([packetType, versionLength, version, sequence, payloadLength, message]);
+};
+
+export const createLoginPacket = (payloadData) => {
+  const protoMessages = getProtoMessages();
+  const logIn = protoMessages.common.S2CLoginResponse;
+
+  // const payload = { payloadData };
+  const message = logIn.create(payloadData);
+  const logInPacket = logIn.encode({ loginResponse: message }).finish();
+  // sequence data를 뭘 넣어야 할지 모르겠음 지금으로써는
+  return serializer(logInPacket, config.packetType.loginResponse, 1);
 };
 
 export const createLocationPacket = (users) => {
