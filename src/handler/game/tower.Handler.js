@@ -7,6 +7,7 @@ import { handleError } from '../../utils/errors/errorHandler.js';
 import { getTowerDataById } from '../../game/tower.js'; // 타워 데이터 가져오기
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
 import CustomError from '../../utils/errors/customError.js';
+import { PACKET_TYPE, PACKET_TYPE_LENGTH } from '../../constants/header.js';
 
 // 타워 추가 요청 처리 핸들러
 
@@ -15,7 +16,6 @@ const towerId = Math.floor(Math.random() * 4) + 1;
 export const addTowerHandler = async ({ socket, payloadData }) => {
   try {
     const { x, y } = payloadData; // x,y 좌표를 클라로부터 받는다.
-
     // 타워 추가 응답 생성
     const protoMessages = getProtoMessages();
     const response = protoMessages.common.GamePacket;

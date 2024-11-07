@@ -113,12 +113,12 @@ export class Tower {
 }
 
 // 타워 데이터 로딩 및 타워 생성
-function loadTowerDataFromJson(json) {
-    const towers = json.data.map(towerData => {
-        return Tower.createTower(towerData, 0, 0); // 초기 위치는 (0, 0)으로 설정
-    });
-    return towers;
-}
+//function loadTowerDataFromJson(json) {
+//     const towers = json.data.map(towerData => {
+//         return Tower.createTower(towerData, 0, 0); // 초기 위치는 (0, 0)으로 설정
+//     });
+//     return towers;
+// }
 
 // 타워 판매 요청을 서버로 전송
 function sendTowerSellRequest(towerId) {
@@ -147,6 +147,12 @@ function getTowerDataById(towerId) {
 
 // 타워 구매 요청을 서버로 전송
 function purchaseTower(x, y) {
+    // 타워가 이미 구매되어 있는지 확인
+    if (towerDataFromJson.length === 0) {
+        console.error("타워 구매 실패: 타워 데이터가 비어 있습니다.");
+        return;  // 타워 데이터가 없으면 구매를 시도하지 않음
+    }
+
     const towerData = { type: 'TOWER_PURCHASE_REQUEST', data: { x, y } };
     sendMessageToServer(towerData);
 }
@@ -155,6 +161,10 @@ function purchaseTower(x, y) {
 function TOWER_PURCHASE_RESPONSE(response) {
     const { towerId, x, y } = response.data;
     const towerData = getTowerDataById(towerId);  // 서버에서 towerId만 받음
+    if (!towerData) {
+        console.error(`타워 데이터가 없습니다. ID: ${towerId}`);
+        return;
+    }
     const tower = Tower.createTower(towerData, x, y);
     addTowerToGame(tower);
 }
@@ -183,11 +193,13 @@ function sendMessageToServer(message) {
 // 타워를 게임에 추가하는 함수
 function addTowerToGame(tower) {
     console.log("Tower added to game:", tower);
+    // 타워가 게임에 추가되었을 때 필요한 추가 로직을 구현하세요.
 }
 
 // 타워를 게임에서 제거하는 함수
 function removeTowerFromGame(tower) {
     console.log(`${tower.displayName} 타워가 게임에서 제거되었습니다.`);
+    // 타워가 게임에서 제거되었을 때 필요한 추가 로직을 구현하세요.
 }
 
 // 타워 데이터는 클라이언트에서 관리되는 구조
