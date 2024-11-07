@@ -4,6 +4,7 @@ import Monster from '../classes/models/monster.class.js';
 export const addMonster = (socket, id, number) => {
   const monster = new Monster(socket, id, number);
   monsterSessions.push(monster);
+  return monster;
 };
 // 몬스터 추가
 // socket, id, number의 값을 갖는 class 객체 배열을 monsterSessions 에 추가
@@ -16,4 +17,15 @@ export const removeMonster = (socket) => {
     return monsterSessions.splice(index, 1)[0];
     // 일치하는 index 값을 제거한 monsterSessions를 반환
   }
+};
+
+// 해당 클라이언트에 소환된 몬스터
+// 사용자가 공격해야하는 몬스터들을 찾을때는 socket만 있으면 된다.
+export const getAllMonsterBySocket = (socket) => {
+  return monsterSessions.filter((monster) => monster.socket === socket);
+};
+
+// 몬스터 하나만 찾을 때는 monster Id 한개만
+export const getMonsterByMonsterId = (monsterId) => {
+  return monsterSessions.find((monster) => monster.id === monsterId);
 };

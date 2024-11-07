@@ -1,12 +1,21 @@
 import { v4 as uuidv4 } from 'uuid';
-import { createMonsterSpawnPacket } from '../../utils/notification/game.notification.js';
+import {
+  createMonsterSpawnPacket,
+  createEnemyMonsterSpawnPacket,
+} from '../../utils/notification/game.notification.js';
 import { addMonster } from '../../session/monster.session.js';
+import { gameSessions } from './sessions.js';
+import { getGameSession } from '../../session/game.session.js';
 
 // message C2SSpawnMonsterRequest {
 // }
 // message S2CSpawnMonsterResponse {
 //     int32 monsterId = 1;
 //     int32 monsterNumber = 2;
+// }
+// message S2CSpawnEnemyMonsterNotification {
+//   int32 monsterId = 1;
+//   int32 monsterNumber = 2;
 // }
 
 // 유저 둘이 같은 몬스터가 리스폰이 되는가?
@@ -23,18 +32,43 @@ import { addMonster } from '../../session/monster.session.js';
 // monsterSession 을 핸들러에 넣어야하는데 그 위치가 어디일까?
 
 const monsterSpawnHandler = async ({ socket, payloadData }) => {
-  const monsterUUID = uuidv4();
-  let randomMonsterId = Math.floor(Math.random() * 5) + 1;
   // monsterSession을 만들고 거기다가 class Monster를 넣고 뺴고 하는 부분을 userSession처럼
   try {
-    const monster = addMonster(socket, id, number);
+    // 몬스터 넣어주고
+    const monster = await addMonster(socket, monsterUUID, randomMonsterId);
+
+    if (!monster) {
+      throw new Error('몬스터 추가가 되지 않습니다.');
+    }
+
+    // 우리가 가지고 있는거 우리의 socket을 가지고 있다 그러면? 내 적의 socket을 찾아보자
+
+    const gameSession = gameSessions.getGameSession(socket.id);
+    //
+    if (!gameSession) {
+      throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
+    }
+
+    const opponentUser = gameSession.users.find((user) => user.socket !== socket);
+
+    if (!opponentUser) {
+      throw new Error('상대 유저를 찾지 못했습니다.');
+    }
+
+    const monsterUUID = uuidv4();
+    const randomMonsterId = Math.floor(Math.random() * 5) + 1;
 
     const monsterSpawnPacket = {
       monsterId: monsterUUID,
       monsterNumber: randomMonsterId,
     };
 
+    // 나한테 보내기
     socket.write(createMonsterSpawnPacket(monsterSpawnPacket));
+    // 적에게 보내기
+    opponentUser.socket.write(createEnemyMonsterSpawnPacket(monsterSpawnPacket));
+
+    console.log(`Monster spawned ID & Number: ${monsterSpawnPacket}`);
   } catch (error) {
     console.error(socket, error);
   }

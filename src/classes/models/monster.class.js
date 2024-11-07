@@ -4,8 +4,8 @@ class Monster {
   // id는 고유한 값 // number가 지금부터 "id": "MON00001",
   // number 뭐가 들어올 수 있을까? 1~5
   constructor(socket, id, number) {
-    this.socket = socket;
-    this.id = id;
+    this.socket = socket; // 해당 유저 찾을때
+    this.id = id; // 고유한값
     this.number = number;
 
     this.DisplayName = '';
