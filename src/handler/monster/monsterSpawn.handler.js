@@ -4,7 +4,7 @@ import {
   createEnemyMonsterSpawnPacket,
 } from '../../utils/notification/game.notification.js';
 import { addMonster } from '../../session/monster.session.js';
-import { gameSessions } from './sessions.js';
+import { gameSessions } from '../../sessions.js';
 import { getGameSession } from '../../session/game.session.js';
 
 // message C2SSpawnMonsterRequest {
@@ -44,12 +44,13 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     // 우리가 가지고 있는거 우리의 socket을 가지고 있다 그러면? 내 적의 socket을 찾아보자
 
     const gameSession = gameSessions.getGameSession(socket.id);
-    //
+    // socket에 있는 id가 맞는 Game을 가져온다
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }
 
     const opponentUser = gameSession.users.find((user) => user.socket !== socket);
+    // 해당 게임의 내가 아닌 다른 유저의 소켓을 찾아서 opponentUser(상대방) 소켓에 넣는다.
 
     if (!opponentUser) {
       throw new Error('상대 유저를 찾지 못했습니다.');
@@ -67,6 +68,7 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     socket.write(createMonsterSpawnPacket(monsterSpawnPacket));
     // 적에게 보내기
     opponentUser.socket.write(createEnemyMonsterSpawnPacket(monsterSpawnPacket));
+    // 상대방 소켓에 있는 몬스터 스폰 정보를 createEnemyMonsterSpawnPacket로 보낸다?
 
     console.log(`Monster spawned ID & Number: ${monsterSpawnPacket}`);
   } catch (error) {
