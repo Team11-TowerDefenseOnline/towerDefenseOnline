@@ -30,7 +30,9 @@ export const onData = (socket) => async (data) => {
       socket.buffer = socket.buffer.subarray(requiredLength);
 
       try {
+        console.log('pk', packetType);
         const handler = getHandlerById(packetType);
+
         handler({ socket, payloadData });
       } catch (e) {
         console.error(e);
