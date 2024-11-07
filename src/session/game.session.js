@@ -11,9 +11,9 @@ import Game from '../classes/models/game.class.js';
 // 게임 세션을 더 추가할지 말지가 되야함
 
 export const addGameSession = (id) => {
-  const session = new Game(id);
-  gameSessions.push(session);
-  return session;
+  const game = new Game(id);
+  gameSessions.push(game);
+  return game;
 };
 
 export const removeGameSession = (id) => {
