@@ -5,15 +5,16 @@ import initialHandler from './user/initial.handler.js';
 import loginHandler from './user/login.handler.js';
 import registerHandler from './user/register.handler.js';
 import monsterSpawnHandler from './monster/monsterSpawn.handler.js';
+import { towerPurchaseHandler } from './game/tower.handler.js';
 
 const handlers = {
   [HANDLER_IDS.INITIAL]: {
     handler: initialHandler,
-    protoType: 'initial.registerResponse',
+    protoType: 'initial.InitialPacket',
   },
   [HANDLER_IDS.REGISTER]: {
     handler: registerHandler,
-    protoType: 'common.S2CLoginResponse',
+    protoType: 'common.C2SRegisterRequest',
   },
   [HANDLER_IDS.LOGIN]: {
     handler: loginHandler,
@@ -21,7 +22,11 @@ const handlers = {
   },
   [HANDLER_IDS.MATCH]: {
     handler: matchHandler,
-    protoType: 'common.S2CMatchStartNotification',
+    protoType: 'common.matchRequest',
+  },
+  [HANDLER_IDS.PUCHASE]: {
+    handler: towerPurchaseHandler,
+    protoType: 'common.C2STowerPurchaseRequest',
   },
   [HANDLER_IDS.MONSTER_SPAWN]: {
     handler: monsterSpawnHandler,
