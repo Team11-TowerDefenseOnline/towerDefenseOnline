@@ -1,10 +1,11 @@
 import { HANDLER_IDS } from '../constants/handlerIds.js';
 import locationUpdateHandler from './game/locationUpdate.handler.js';
 import matchHandler from './game/match.handler.js';
-import { towerPurchaseHandler } from './game/tower.handler.js';
 import initialHandler from './user/initial.handler.js';
 import loginHandler from './user/login.handler.js';
 import registerHandler from './user/register.handler.js';
+import monsterSpawnHandler from './monster/monsterSpawn.handler.js';
+import { towerPurchaseHandler } from './game/tower.handler.js';
 
 const handlers = {
   [HANDLER_IDS.INITIAL]: {
@@ -26,6 +27,10 @@ const handlers = {
   [HANDLER_IDS.PUCHASE]: {
     handler: towerPurchaseHandler,
     protoType: 'common.C2STowerPurchaseRequest',
+  },
+  [HANDLER_IDS.MONSTER_SPAWN]: {
+    handler: monsterSpawnHandler,
+    protoType: 'common.S2CSpawnMonsterResponse',
   },
 };
 

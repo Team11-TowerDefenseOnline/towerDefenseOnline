@@ -22,6 +22,24 @@ export const serializer = (message, type, sequenceData) => {
   return Buffer.concat([packetType, versionLength, version, sequence, payloadLength, message]);
 };
 
+export const createMonsterSpawnPacket = (payloadData) => {
+  const protoMessages = getProtoMessages();
+  const response = protoMessages.common.GamePacket;
+
+  const message = response.create(payloadData);
+  const responsePacket = response.encode({ spawnMonsterResponse: payloadData }).finish();
+  return serializer(responsePacket, config.packetType.spawnMonsterResponse, 1);
+};
+
+export const createEnemyMonsterSpawnPacket = (payloadData) => {
+  const protoMessages = getProtoMessages();
+  const response = protoMessages.common.GamePacket;
+
+  const message = response.create(payloadData);
+  const responsePacket = response.encode({ spawnEnemyMonsterNotification: payloadData }).finish();
+  return serializer(responsePacket, config.packetType.spawnEnemyMonsterNotification, 1);
+};
+
 export const createLoginPacket = (payloadData) => {
   const protoMessages = getProtoMessages();
   const logIn = protoMessages.common.GamePacket;
