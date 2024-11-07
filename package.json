@@ -12,7 +12,8 @@
     "type": "git",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "migrate": "node src/db/migration/createSchemas.js"
+    "migrate": "node src/db/migration/createSchemas.js",
+    "test": "node src/test.js"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +26,7 @@
     "long": "^5.2.3",
     "mysql2": "^3.11.3",
     "protobufjs": "^7.4.0",
+    "tree": "^0.1.3",
     "uuid": "^11.0.2"
   },
   "devDependencies": {
