@@ -5,7 +5,7 @@ import initialHandler from './user/initial.handler.js';
 import loginHandler from './user/login.handler.js';
 import registerHandler from './user/register.handler.js';
 import monsterSpawnHandler from './monster/monsterSpawn.handler.js';
-import { towerPurchaseHandler } from './game/tower.handler.js';
+import { towerAttackHandler, towerPurchaseHandler } from './game/tower.handler.js';
 
 const handlers = {
   [HANDLER_IDS.INITIAL]: {
@@ -31,6 +31,10 @@ const handlers = {
   [HANDLER_IDS.MONSTER_SPAWN]: {
     handler: monsterSpawnHandler,
     protoType: 'common.S2CSpawnMonsterResponse',
+  },
+  [HANDLER_IDS.TOWER_ATTACK]: {
+    handler: towerAttackHandler,
+    protoType: 'common.C2STowerAttackRequest',
   },
 };
 

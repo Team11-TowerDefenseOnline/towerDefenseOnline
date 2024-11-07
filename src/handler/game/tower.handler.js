@@ -14,8 +14,15 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
   const { x, y } = payloadData;
 
+  const gameSession = gameSessions.getGameSession(socket.id);
+  if (!gameSession) {
+    throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
+  }
+  const user = gameSession.getUser(socket.uuid);
+  const opponentUser = gameSession.users.find((user) => user.socket !== socket);
+
   // 현재 가지고 있는 타워 리스트 데이터를 가져옴.
-  towers;
+  const towers = gameSession.towers;
 
   // 타워 리스트 안에 겹치는 위치에 포탑이 있는지 검증
   if (towers.some((tower) => tower.x == x && tower.y == y)) {
@@ -26,15 +33,38 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   const randomTowerId = Math.floor(Math.random() * 4) + 1;
 
   // 타워를 리스트 추가
-  towers.push(new Tower(randomTowerId, x, y));
+  gameSession.addTower(new Tower(randomTowerId, x, y));
 
-  // 해당 유저의 돈 소모
-  const user = getUserBySocket(socket);
+  // 해당 유저의 돈 소모 (소지금에 대한 정보를 못 받는데 검증 의미가 있나?)
   user.gold -= 3000;
 
-  // 소켓을 통해서 반환
+  // 구매 완료 응답
   const response = protoMessages.common.GamePacket;
-  console.log(response.towerPurchaseResponse);
-  const packet = response.encode({ towerPurchaseResponse: { towerId: randomTowerId } }).finish();
+  console.log('towerPurchaseResponse:', response.towerPurchaseResponse);
+  let packet = response.encode({ towerPurchaseResponse: { towerId: randomTowerId } }).finish();
   socket.write(serializer(packet, 9, 1));
+
+  // 상대방에게 타워 구매를 알림
+  packet = response
+    .encode({ addEnemyTowerNotification: { towerId: randomTowerId, x, y } })
+    .finish();
+  opponentUser.socket.write(serializer(packet, 10, 1));
+};
+
+export const towerAttackHandler = async ({ socket, payloadData }) => {
+  const { towerId, monsterId } = payloadData;
+
+  // 게임 세션 및 상대 정보 획득
+  const gameSession = gameSessions.getGameSession(socket.id);
+  if (!gameSession) {
+    throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
+  }
+  const opponentUser = gameSession.users.find((user) => user.socket !== socket);
+
+  // 타워가 존재하는지 검증
+  // 몬스터가 존재하는지 검증
+
+  // 상대에게 공격을 알림
+  const packet = response.encode({ enemyTowerAttackNotification: { towerId, monsterId } }).finish();
+  opponentUser.socket.write(serializer(packet, 15, 1));
 };
