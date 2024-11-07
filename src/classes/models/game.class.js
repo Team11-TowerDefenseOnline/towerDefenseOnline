@@ -1,10 +1,11 @@
-import { createLocationPacket } from "../../utils/notification/game.notification.js";
-import LatencyManager from "../managers/latency.manager.js";
+import { createLocationPacket } from '../../utils/notification/game.notification.js';
+import LatencyManager from '../managers/latency.manager.js';
 
 class Game {
   constructor(id) {
     this.id = id;
     this.users = [];
+    this.towers = [];
     this.latencyManager = new LatencyManager();
   }
 
@@ -49,6 +50,10 @@ class Game {
       });
 
     return createLocationPacket(location);
+  }
+
+  addTower(tower) {
+    this.towers.push(tower);
   }
 }
 

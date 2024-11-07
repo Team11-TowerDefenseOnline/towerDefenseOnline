@@ -68,7 +68,9 @@ const loginHandler = async ({ socket, payloadData }) => {
     };
 
     const user = new User(socket, isExistUserInDB.userId, isExistUserInDB.highScore);
+    // redis에 해당 user정보를 저장해둬야함
     await addUser(user);
+
     // const response = protoMessages.common.GamePacket;
     // const packet = response.encode({ loginResponse: sendPayload }).finish();
   } catch (error) {

@@ -3,3 +3,5 @@ export const gameSessions = [];
 export const matchSessions = [];
 export const towers = [];
 export const monsterSessions = [];
+
+export const testSessions = [];
