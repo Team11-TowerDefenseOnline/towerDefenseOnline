@@ -50,6 +50,7 @@ export const loadProtos = async () => {
         protoMessages[namespace][type] = root.lookupEnum(typeName);
       }
     }
+
     // console.log('테스트중 => ', protoMessages['common'].GlobalFailCode.values.UNKNOWN_ERROR);
 
     console.log('Protobuf 파일이 로드되었습니다.');
