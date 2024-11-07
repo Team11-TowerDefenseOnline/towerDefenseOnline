@@ -70,3 +70,16 @@ export const createPingPacket = (timestamp) => {
   const pingPacket = ping.encode(message).finish();
   return serializer(pingPacket, config.packetType.ping);
 };
+
+export const createStateSyncPacket = (payloadData) => {
+
+  const protoMessage = getProtoMessages();
+  const stateSync = protoMessage.GamePacket.stateSync;
+
+  //const payload = {payloadData}
+  const message = stateSync.create(payloadData);
+  const stateSyncPacket = stateSync.encode(payloadData).finish();
+
+  return serializer(stateSyncPacket, config.packetType.stateSyncNotification,1);
+
+};

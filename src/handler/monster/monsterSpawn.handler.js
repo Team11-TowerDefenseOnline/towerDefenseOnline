@@ -1,9 +1,11 @@
 import {
   createMonsterSpawnPacket,
   createEnemyMonsterSpawnPacket,
+  createStateSyncPacket
 } from '../../utils/notification/game.notification.js';
 import { addMonster } from '../../session/monster.session.js';
 import { getGameSession } from '../../session/game.session.js';
+import initServer from '../../init/index.js';
 
 // message C2SSpawnMonsterRequest {
 // }
@@ -64,11 +66,22 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     };
     //console.log('monsterSpawnPacket : ', monsterSpawnPacket);
 
+    const user = gameSession.getUser(socket.uuid);
+
+    const stateSyncPacket = {
+        userGold : user.userGold,
+        baseHp : user.baseHp,
+        monsterLevel : user.monsterLevel,
+        score : user.score,
+        towers : user.towers,
+        monsters : monsterSpawnPacket
+        }; //싱크할 데이터: monster에만 스폰 데이터.
+
     // 나한테 보내기
     Promise.all([
       socket.write(createMonsterSpawnPacket(monsterSpawnPacket)),
       opponentUser.socket.write(createEnemyMonsterSpawnPacket(monsterSpawnPacket)),
-      socket.write(createStateSyncPacket()),
+      socket.write(createStateSyncPacket(stateSyncPacket)),
     ]);
   } catch (error) {
     console.error(error);
@@ -88,7 +101,7 @@ export default monsterSpawnHandler;
 }
  */
 
-// 적에게 보내기\
+// 적에게 보내기
 /**
  * 상태동기화를 보내줘야함
  *  -> [상태 동기화]=>packet패킷 [보내는 것]=>socket을 넣어야함.

@@ -6,6 +6,7 @@ import loginHandler from './user/login.handler.js';
 import registerHandler from './user/register.handler.js';
 import monsterSpawnHandler from './monster/monsterSpawn.handler.js';
 import { towerAttackHandler, towerPurchaseHandler } from './game/tower.handler.js';
+import stateSyncNotificationHandler from './game/stateSyncNotification.handler.js';
 
 const handlers = {
   [HANDLER_IDS.INITIAL]: {
@@ -23,6 +24,10 @@ const handlers = {
   [HANDLER_IDS.MATCH]: {
     handler: matchHandler,
     protoType: 'common.matchRequest',
+  },
+  [HANDLER_IDS.SYNC]: {
+    handler: stateSyncNotificationHandler,
+    protoType: 'common.S2CStateSyncNotification',
   },
   [HANDLER_IDS.PURCHASE]: {
     handler: towerPurchaseHandler,
