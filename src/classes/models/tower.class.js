@@ -175,7 +175,7 @@ function sendTowerAttackRequest(towerId, monsterId) {
     sendMessageToServer(attackData);
 }
 
-// 서버로 메시지를 전송하는 함수 (예시)
+// 서버로 메시지를 전송하는 함수 
 function sendMessageToServer(message) {
     console.log('Sending message to server:', message);
 }
@@ -193,7 +193,7 @@ function removeTowerFromGame(tower) {
 // 타워 데이터는 클라이언트에서 관리되는 구조
 let towerDataFromJson = [];
 
-// JSON 파일을 로드하고 파싱하는 예시 (파일 로딩 방식은 서버 환경에 맞게 수정)
+// JSON 파일을 로드하고 파싱 - 서버환경에 맞게 수정 ++++
 fetch('assets/tower.json')
     .then(response => response.json())
     .then(json => {
