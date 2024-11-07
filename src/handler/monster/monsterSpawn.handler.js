@@ -32,7 +32,6 @@ let count = 1;
 
 const monsterSpawnHandler = async ({ socket, payloadData }) => {
   // monsterSession을 만들고 거기다가 class Monster를 넣고 뺴고 하는 부분을 userSession처럼
-  console.log('monsterSpawnHandler => ');
   try {
     // 몬스터 넣어주고
 
@@ -42,7 +41,7 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     //
 
     // console.log('gameSession : ', gameSession);
-    console.log('socket.id : ', socket.id);
+    // console.log('socket.id : ', socket.id);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }
@@ -52,10 +51,8 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     if (!opponentUser) {
       throw new Error('상대 유저를 찾지 못했습니다.');
     }
-    console.log('addMonster 전');
     const randomMonsterId = Math.floor(Math.random() * 5) + 1;
     const monster = await addMonster(socket, count, randomMonsterId);
-    console.log('addMonster 후');
 
     if (!monster) {
       throw new Error('몬스터 추가가 되지 않습니다.');

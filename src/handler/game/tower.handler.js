@@ -28,7 +28,7 @@ import Tower from '../../classes/models/tower.class.js';
 export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
   const { x, y } = payloadData;
-  console.log('towerPurchaseHandler running!');
+  console.log(`towerPurchaseHandler running! payload:${payloadData} x:${x}, y:${y}`);
 
   const gameSession = getGameSession(socket.id);
   if (!gameSession) {
@@ -74,7 +74,7 @@ export const towerAttackHandler = async ({ socket, payloadData }) => {
   const { towerId, monsterId } = payloadData;
 
   // 게임 세션 및 상대 정보 획득
-  const gameSession = gameSessions.getGameSession(socket.id);
+  const gameSession = getGameSession(socket.id);
   if (!gameSession) {
     throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
   }
