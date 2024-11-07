@@ -24,7 +24,16 @@ const registerHandler = async ({ socket, payloadData }) => {
       failCode: 0,
     };
   } catch (error) {
-    console.error(`회원가입 실패: ${error}`);
+    let errorMessage = '';
+    switch (error.name) {
+      case 'ValidationError':
+        const factors = [...error.message.matchAll(/"([^"]*)"/g)];
+        errorMessage = `올바르지 않은 형태의 가입 정보 ${factors[0][1]}의 입력값:${factors[1][1]}`;
+        break;
+      default:
+        errorMessage = '알 수 없는 에러' + error;
+    }
+    console.error(`회원가입 실패: ${errorMessage}`);
 
     sendPayload = {
       success: false,
