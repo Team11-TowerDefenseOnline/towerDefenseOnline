@@ -10,11 +10,27 @@ import { testConnection } from '../../utils/testConnection/testConnection.js';
 import { getUserBySocket } from '../../session/user.session.js';
 import Tower from '../../classes/models/tower.class.js';
 
+// message C2STowerPurchaseRequest {
+//   float x = 1;
+//   float y = 2;
+// }
+
+// message S2CTowerPurchaseResponse {
+//   int32 towerId = 1;
+// }
+
+// message S2CAddEnemyTowerNotification {
+//   int32 towerId = 1;
+//   float x = 2;
+//   float y = 3;
+// }
+
 export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
   const { x, y } = payloadData;
+  console.log('towerPurchaseHandler running!');
 
-  const gameSession = gameSessions.getGameSession(socket.id);
+  const gameSession = getGameSession(socket.id);
   if (!gameSession) {
     throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
   }
@@ -38,6 +54,8 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   // 해당 유저의 돈 소모 (소지금에 대한 정보를 못 받는데 검증 의미가 있나?)
   user.gold -= 3000;
 
+  // 돈 부족하면 에러 발생 시켜야됨.
+
   // 구매 완료 응답
   const response = protoMessages.common.GamePacket;
   console.log('towerPurchaseResponse:', response.towerPurchaseResponse);
@@ -48,6 +66,7 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   packet = response
     .encode({ addEnemyTowerNotification: { towerId: randomTowerId, x, y } })
     .finish();
+  console.log(packet);
   opponentUser.socket.write(serializer(packet, 10, 1));
 };
 

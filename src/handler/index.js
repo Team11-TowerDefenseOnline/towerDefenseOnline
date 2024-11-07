@@ -24,7 +24,7 @@ const handlers = {
     handler: matchHandler,
     protoType: 'common.matchRequest',
   },
-  [HANDLER_IDS.PUCHASE]: {
+  [HANDLER_IDS.PURCHASE]: {
     handler: towerPurchaseHandler,
     protoType: 'common.C2STowerPurchaseRequest',
   },
