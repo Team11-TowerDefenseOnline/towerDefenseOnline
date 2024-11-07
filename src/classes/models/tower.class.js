@@ -5,3 +5,5 @@ class Tower {
     this.y = y;
   }
 }
+
+export default Tower;

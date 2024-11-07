@@ -8,6 +8,7 @@ import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
 import { testConnection } from '../../utils/testConnection/testConnection.js';
 import { getUserBySocket } from '../../session/user.session.js';
+import Tower from '../../classes/models/tower.class.js';
 
 export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
