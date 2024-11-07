@@ -32,6 +32,8 @@ const matchHandler = async ({ socket, payloadData }) => {
     session.addUser(users[0]);
     session.addUser(users[1]);
 
+    socket.id = count;
+
     try {
       const initialGameStateData = {
         baseHp: 1000,
