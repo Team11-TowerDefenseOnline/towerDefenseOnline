@@ -13,7 +13,7 @@ import { testConnection } from '../../utils/testConnection/testConnection.js';
 //     GameState playerData = 2;
 //     GameState opponentData = 3;
 // }
-let count = 0;
+let count = 1;
 
 const matchHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
@@ -27,10 +27,15 @@ const matchHandler = async ({ socket, payloadData }) => {
   } else {
     // 유저가 짝수일때
     const users = userSessions.slice(-2);
+    users[0].socket.id = count;
+    users[1].socket.id = count;
+
     // 유저를 해당 게임 세션에 넣어줌
-    const session = addGameSession(count++);
+    const session = await addGameSession(count++);
     session.addUser(users[0]);
     session.addUser(users[1]);
+
+    socket.id = count;
 
     try {
       const initialGameStateData = {
