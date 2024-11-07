@@ -1,10 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
 import {
   createMonsterSpawnPacket,
   createEnemyMonsterSpawnPacket,
 } from '../../utils/notification/game.notification.js';
 import { addMonster } from '../../session/monster.session.js';
-import { gameSessions } from '../../sessions.js';
 import { getGameSession } from '../../session/game.session.js';
 
 // message C2SSpawnMonsterRequest {
@@ -30,21 +28,21 @@ import { getGameSession } from '../../session/game.session.js';
 // socket은 들어오지만 payloadData는 들어오는게 없다.
 
 // monsterSession 을 핸들러에 넣어야하는데 그 위치가 어디일까?
+let count = 1;
 
 const monsterSpawnHandler = async ({ socket, payloadData }) => {
   // monsterSession을 만들고 거기다가 class Monster를 넣고 뺴고 하는 부분을 userSession처럼
+  console.log('monsterSpawnHandler => ');
   try {
     // 몬스터 넣어주고
-    const monster = await addMonster(socket, monsterUUID, randomMonsterId);
-
-    if (!monster) {
-      throw new Error('몬스터 추가가 되지 않습니다.');
-    }
 
     // 우리가 가지고 있는거 우리의 socket을 가지고 있다 그러면? 내 적의 socket을 찾아보자
 
-    const gameSession = gameSessions.getGameSession(socket.id);
-    // socket에 있는 id가 맞는 Game을 가져온다
+    const gameSession = getGameSession(socket.id);
+    //
+
+    // console.log('gameSession : ', gameSession);
+    console.log('socket.id : ', socket.id);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }
@@ -55,24 +53,30 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     if (!opponentUser) {
       throw new Error('상대 유저를 찾지 못했습니다.');
     }
-
-    const monsterUUID = uuidv4();
+    console.log('addMonster 전');
     const randomMonsterId = Math.floor(Math.random() * 5) + 1;
+    const monster = await addMonster(socket, count, randomMonsterId);
+    console.log('addMonster 후');
+
+    if (!monster) {
+      throw new Error('몬스터 추가가 되지 않습니다.');
+    }
 
     const monsterSpawnPacket = {
-      monsterId: monsterUUID,
+      monsterId: count++,
       monsterNumber: randomMonsterId,
     };
+    //console.log('monsterSpawnPacket : ', monsterSpawnPacket);
 
     // 나한테 보내기
-    socket.write(createMonsterSpawnPacket(monsterSpawnPacket));
-    // 적에게 보내기
-    opponentUser.socket.write(createEnemyMonsterSpawnPacket(monsterSpawnPacket));
-    // 상대방 소켓에 있는 몬스터 스폰 정보를 createEnemyMonsterSpawnPacket로 보낸다?
+    Promise.all([
+      socket.write(createMonsterSpawnPacket(monsterSpawnPacket)),
+      opponentUser.socket.write(createEnemyMonsterSpawnPacket(monsterSpawnPacket)),
+    ]);
 
-    console.log(`Monster spawned ID & Number: ${monsterSpawnPacket}`);
+    // 적에게 보내기
   } catch (error) {
-    console.error(socket, error);
+    console.error(error);
   }
 };
 
