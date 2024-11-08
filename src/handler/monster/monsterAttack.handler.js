@@ -38,11 +38,23 @@ const monsterAttackHandler = async ({ socket, payloadData }) => {
     console.log('베이스 체력 : ', myBaseHp);
 
     const response = protoMessages.common.GamePacket;
-    const packet = response
-      .encode({ S2CUpdateBaseHPNotification: { isOpponent: false, baseHp: myBaseHp } })
-      .finish();
 
-    socket.write(serializer(packet, config.packetType.updateBaseHpNotification, 1));
+    if (myBaseHp < 0) {
+      console.log(`${socket.uuid}의 베이스 체력: ${myBaseHp}`);
+
+      let packet = response.encode({ S2CGameOverNotification: { isWin: true } }).finish();
+      const opponentUser = gameSession.users.find((user) => user.socket !== socket);
+      opponentUser.socket.write(serializer(packet, config.packetType.gameOverNotification, 1));
+
+      packet = response.encode({ S2CGameOverNotification: { isWin: false } }).finish();
+      socket.write(serializer(packet, config.packetType.gameOverNotification, 1));
+    } else {
+      const packet = response
+        .encode({ S2CUpdateBaseHPNotification: { isOpponent: false, baseHp: myBaseHp } })
+        .finish();
+
+      socket.write(serializer(packet, config.packetType.updateBaseHpNotification, 1));
+    }
   } catch (error) {
     console.error(error);
   }
