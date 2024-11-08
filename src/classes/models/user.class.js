@@ -1,3 +1,5 @@
+import IntervalManager from '../managers/interval.manager.js';
+
 class User {
   constructor(socket, id, highScore) {
     this.socket = socket;
@@ -6,6 +8,7 @@ class User {
     this.lastUpdateTime = Date.now();
     this.highScore = highScore || 0;
     this.gold = 0;
+    this.intervalManager = new IntervalManager();
   }
 
   setHighScore(highScore) {
@@ -14,6 +17,10 @@ class User {
 
   getHighScore() {
     return this.highScore;
+  }
+
+  getIntervalManager() {
+    return this.intervalManager;
   }
 }
 

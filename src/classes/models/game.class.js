@@ -24,20 +24,25 @@ class Game {
 
   //userId, gold, base, score, towers, monsters
   addNewGameState(userId) {
-    const initGold = 1000;
+    const initGold = 10000;
     const initBaseHp = 500;
     const towers = [
       { towerId: 4, x: 900, y: 300 },
       { towerId: 5, x: 900, y: 100 },
       { towerId: 6, x: 500, y: 300 },
     ];
-    const monsters = [{ monsterId: 1, monsterNumber: 1 }];
+    const monsters = [];
     this.gameStates.push(new GameState(userId, initGold, initBaseHp, towers, monsters));
+  }
+
+  getGameStateData(userId) {
+    const gameState = this.gameStates.find((gameState) => gameState.userId == userId);
+    return gameState.getStateData();
   }
 
   getGameState(userId) {
     const gameState = this.gameStates.find((gameState) => gameState.userId == userId);
-    return gameState.getStateData();
+    return gameState;
   }
 }
 
