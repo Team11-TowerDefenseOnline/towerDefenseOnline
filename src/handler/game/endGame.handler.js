@@ -5,12 +5,10 @@ import {
   serializer,
 } from '../../utils/notification/game.notification.js';
 import { getGameSession, removeGameSession } from '../../session/game.session.js';
-import { getProtoMessages } from '../../init/loadProto.js';
-import { config } from '../../config/config.js';
 
 //   message C2SGameEndRequest {}
 
-const endGameRequest = async ({ socket, payloadData }) => {
+const endGameHandler = async ({ socket, payloadData }) => {
   try {
     const gameSession = getGameSession(socket.id);
     if (!gameSession) {
@@ -24,4 +22,4 @@ const endGameRequest = async ({ socket, payloadData }) => {
   }
 };
 
-export default monsterAttackHandler;
+export default endGameHandler;

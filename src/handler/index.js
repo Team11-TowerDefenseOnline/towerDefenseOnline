@@ -9,6 +9,7 @@ import { towerAttackHandler, towerPurchaseHandler } from './game/tower.handler.j
 import stateSyncNotificationHandler from './game/stateSyncNotification.handler.js';
 import monsterAttackHandler from './monster/monsterAttack.handler.js';
 import monsterDeathHendler from './monster/mosterDeath.handler.js';
+import endGameHandler from './game/endGame.handler.js';
 
 const handlers = {
   [HANDLER_IDS.INITIAL]: {
@@ -50,6 +51,10 @@ const handlers = {
   [HANDLER_IDS.MONSTER_DEATH]: {
     handler: monsterDeathHendler,
     protoType: 'common.C2SMonsterAttackBaseRequest',
+  },
+  [HANDLER_IDS.GAME_END]: {
+    handler: endGameHandler,
+    protoType: 'common.C2SGameEndRequest ',
   },
 };
 
