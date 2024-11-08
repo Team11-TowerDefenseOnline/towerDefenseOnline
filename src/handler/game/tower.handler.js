@@ -25,6 +25,7 @@ import { addTower } from '../../session/tower.session.js';
 //   float x = 2;
 //   float y = 3;
 // }
+let count = 1;
 
 export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
@@ -49,10 +50,11 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   }
   // 타워 ID를 랜덤하게 지급
   const randomTowerId = Math.floor(Math.random() * 4) + 1;
+  count++;
 
   // 타워를 리스트 추가
-  const myTower = new Tower(socket, randomTowerId, x, y);
-  const opponentTower = new Tower(opponentUser.socket, randomTowerId, x, y + 1);
+  const myTower = new Tower(socket, count, x, y);
+  const opponentTower = new Tower(opponentUser.socket, count, x, y + 1);
   addTower(myTower);
   addTower(opponentTower);
 
@@ -63,15 +65,18 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
 
   // 구매 완료 응답
   const response = protoMessages.common.GamePacket;
-  const packet = response.encode({ towerPurchaseResponse: { towerId: randomTowerId } }).finish();
+  const packet = response.encode({ towerPurchaseResponse: { towerId: myTower.id } }).finish();
 
   // 상대방에게 타워 구매를 알림
   const opponentPacket = response
     .encode({
-      addEnemyTowerNotification: { towerId: randomTowerId, x: opponentTower.x, y: opponentTower.y },
+      addEnemyTowerNotification: {
+        towerId: opponentTower.id,
+        x: opponentTower.x,
+        y: opponentTower.y,
+      },
     })
     .finish();
-  console.log(packet);
 
   Promise.all([
     socket.write(serializer(packet, config.packetType.towerPurchaseResponse, 1)),
