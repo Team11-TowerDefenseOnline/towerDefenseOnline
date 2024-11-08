@@ -7,6 +7,7 @@ import { onData } from './onData.js';
 export const onConnection = (socket) => {
     console.log('클라이언트 연결 성공 :', socket.remoteAddress, socket.remotePort);
 
+
     // 소켓에 버퍼를 하나 만든다. 각 클라이언트를 구분해서 저장하는 용도로 활용됨.
     socket.buffer = Buffer.alloc(0)
 
