@@ -178,14 +178,14 @@ const matchHandler = async ({ socket, payloadData }) => {
           .addGame(
             originGameSessionId,
             () => stateSyncNotificationHandler({ socket: users[0].socket, payloadData: undefined }),
-            1000,
+            100,
           );
         users[1]
           .getIntervalManager()
           .addGame(
             originGameSessionId,
             () => stateSyncNotificationHandler({ socket: users[1].socket, payloadData: undefined }),
-            1000,
+            100,
           );
       });
     } catch (error) {

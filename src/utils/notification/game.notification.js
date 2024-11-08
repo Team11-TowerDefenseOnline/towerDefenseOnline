@@ -79,7 +79,7 @@ export const createStateSyncPacket = (gameSession, userId) => {
   const myGameState = gameSession.getGameStateData(userId);
 
   const stateSyncPacket = stateSync.encode({ stateSyncNotification: myGameState }).finish();
-  console.log('stateSyncPacket : ', stateSync.decode(stateSyncPacket));
+  //console.log('stateSyncPacket : ', stateSync.decode(stateSyncPacket));
 
   return serializer(stateSyncPacket, config.packetType.stateSyncNotification, 1);
 };

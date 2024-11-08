@@ -58,7 +58,7 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
     const myTower = addTower(x, y);
 
     // 해당 유저의 돈 소모 (소지금에 대한 정보를 못 받는데 검증 의미가 있나?)
-    user.gold -= 3000;
+    gameSession.getGameState(user.id).userGold -= 300;
 
     // 돈 부족하면 에러 발생 시켜야됨.
 
@@ -92,7 +92,6 @@ export const towerAttackHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
   const request = protoMessages.common.C2STowerAttackRequest;
   const { towerId, monsterId } = request.decode(payloadData.subarray(2));
-  console.log('payloadData: ', payloadData);
 
   // 게임 세션 및 상대 정보 획득
   const gameSession = getGameSession(socket.id);
