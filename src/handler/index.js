@@ -41,6 +41,18 @@ const handlers = {
     handler: towerAttackHandler,
     protoType: 'common.C2STowerAttackRequest',
   },
+  [HANDLER_IDS.MONSTER_ATTACK]: {
+    handler: () => {
+      console.log('몬스터 어택 요청: 16');
+    },
+    protoType: 'common.C2SMonsterAttackBaseRequest',
+  },
+  [HANDLER_IDS.MONSTER_DEATH]: {
+    handler: () => {
+      console.log('몬스터 죽음: 20');
+    },
+    protoType: 'common.C2SMonsterAttackBaseRequest',
+  },
 };
 
 export const getProtoTypeByHandlerId = (handlerId) => {

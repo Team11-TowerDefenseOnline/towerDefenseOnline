@@ -1,10 +1,19 @@
 import { towers } from './sessions.js';
 import Tower from '../classes/models/tower.class.js';
 
-export const addTower = (socket, id, x, y) => {
-  const tower = new Tower(socket, id, x, y);
+let towerCount = 1;
+
+export const addTower = (x, y) => {
+  const tower = new Tower(towerCount++, x, y);
   towers.push(tower);
   return tower;
+};
+
+export const initAddTower = (x, y) => {
+  const tower = new Tower(towerCount++, x, y);
+  towers.push(tower);
+
+  return tower.getTowerData();
 };
 
 export const removeTower = (socket) => {

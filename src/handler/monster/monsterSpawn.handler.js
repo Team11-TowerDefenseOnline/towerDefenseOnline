@@ -72,7 +72,7 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     Promise.all([
       socket.write(createMonsterSpawnPacket(monsterSpawnPacket)),
       opponentUser.socket.write(createEnemyMonsterSpawnPacket(monsterSpawnPacket)),
-      socket.write(createStateSyncPacket(gameSession, user.id)),
+      // socket.write(createStateSyncPacket(gameSession, user.id)),
     ]);
   } catch (error) {
     console.error(error);
