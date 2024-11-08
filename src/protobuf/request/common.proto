@@ -101,8 +101,6 @@ message S2CStateSyncNotification {
     int32 baseHp = 2;
     int32 monsterLevel = 3;
     int32 score = 4;
-    repeated TowerData towers = 5;
-    repeated MonsterData monsters = 6;
 }
 
 message C2STowerPurchaseRequest {

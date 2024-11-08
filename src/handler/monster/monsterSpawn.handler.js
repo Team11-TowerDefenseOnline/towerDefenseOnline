@@ -1,7 +1,7 @@
 import {
   createMonsterSpawnPacket,
   createEnemyMonsterSpawnPacket,
-  createStateSyncPacket
+  createStateSyncPacket,
 } from '../../utils/notification/game.notification.js';
 import { addMonster } from '../../session/monster.session.js';
 import { getGameSession } from '../../session/game.session.js';
@@ -68,20 +68,11 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
 
     const user = gameSession.getUser(socket.uuid);
 
-    const stateSyncPacket = {
-        userGold : user.userGold,
-        baseHp : user.baseHp,
-        monsterLevel : user.monsterLevel,
-        score : user.score,
-        towers : user.towers,
-        monsters : monsterSpawnPacket
-        }; //싱크할 데이터: monster에만 스폰 데이터.
-
     // 나한테 보내기
     Promise.all([
       socket.write(createMonsterSpawnPacket(monsterSpawnPacket)),
       opponentUser.socket.write(createEnemyMonsterSpawnPacket(monsterSpawnPacket)),
-      socket.write(createStateSyncPacket(stateSyncPacket)),
+      socket.write(createStateSyncPacket(gameSession, user.id)),
     ]);
   } catch (error) {
     console.error(error);

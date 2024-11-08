@@ -2,7 +2,7 @@ import { getProtoMessages } from '../../init/loadProto.js';
 import { addGameSession, getGameSession } from '../../session/game.session.js';
 import { config } from '../../config/config.js';
 import { gameSessions, matchSessions, userSessions } from '../../session/sessions.js';
-import { serializer } from '../../utils/notification/game.notification.js';
+import { createStateSyncPacket, serializer } from '../../utils/notification/game.notification.js';
 import { handleError } from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
@@ -37,8 +37,13 @@ const matchHandler = async ({ socket, payloadData }) => {
 
     // 유저를 해당 게임 세션에 넣어줌
     const session = await addGameSession(count++);
+    console.log(users[0]);
     session.addUser(users[0]);
     session.addUser(users[1]);
+    session.addNewGameState(users[0].id);
+    session.addNewGameState(users[1].id);
+
+    // 임시코드
 
     console.log('try 전까지');
     try {
@@ -65,10 +70,9 @@ const matchHandler = async ({ socket, payloadData }) => {
         maxHp: 100, // 기지의 최대 HP
         highScore: 0, // 플레이어의 최고 점수
         towers: [
-          // 플레이어의 타워 목록
-          { towerId: 4, x: 900, y: 400 },
-          { towerId: 5, x: 1000, y: 400 },
-          { towerId: 6, x: 1100, y: 400 },
+          { towerId: 4, x: 900, y: 300 },
+          { towerId: 5, x: 900, y: 100 },
+          { towerId: 6, x: 500, y: 300 },
         ],
         monsters: [],
         monsterLevel: 1, // 몬스터의 현재 레벨
@@ -106,10 +110,9 @@ const matchHandler = async ({ socket, payloadData }) => {
         maxHp: 100, // 기지의 최대 HP
         highScore: 0, // 플레이어의 최고 점수
         towers: [
-          // 플레이어의 타워 목록
-          { towerId: 4, x: 900, y: 400 },
-          { towerId: 5, x: 1000, y: 400 },
-          { towerId: 6, x: 1100, y: 400 },
+          { towerId: 4, x: 900, y: 300 },
+          { towerId: 5, x: 900, y: 100 },
+          { towerId: 6, x: 500, y: 300 },
         ],
         monsters: [
           // 플레이어의 몬스터 목록
@@ -157,6 +160,8 @@ const matchHandler = async ({ socket, payloadData }) => {
       Promise.all([
         users[0].socket.write(serializer(packet, 6, 1)),
         users[1].socket.write(serializer(packet, 6, 1)),
+        //users[0].socket.write(createStateSyncPacket(session, users[0].id)),
+        //users[1].socket.write(createStateSyncPacket(session, users[1].id)),
       ]);
     } catch (error) {
       console.error(`${socket} : ${error}`);

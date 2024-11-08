@@ -71,15 +71,15 @@ export const createPingPacket = (timestamp) => {
   return serializer(pingPacket, config.packetType.ping);
 };
 
-export const createStateSyncPacket = (payloadData) => {
-
+export const createStateSyncPacket = (gameSession, userId) => {
   const protoMessage = getProtoMessages();
-  const stateSync = protoMessage.GamePacket.stateSync;
+  const stateSync = protoMessage.common.GamePacket;
 
-  //const payload = {payloadData}
-  const message = stateSync.create(payloadData);
-  const stateSyncPacket = stateSync.encode(payloadData).finish();
+  // 소켓을 통해서 해당 유저의 GameState를 가져와야함.
+  const myGameState = gameSession.getGameState(userId);
 
-  return serializer(stateSyncPacket, config.packetType.stateSyncNotification,1);
+  const stateSyncPacket = stateSync.encode({ stateSyncNotification: myGameState }).finish();
+  console.log('stateSyncPacket : ', stateSync.decode(stateSyncPacket));
 
+  return serializer(stateSyncPacket, config.packetType.stateSyncNotification, 1);
 };
