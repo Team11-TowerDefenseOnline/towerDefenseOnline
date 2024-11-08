@@ -1,7 +1,7 @@
 import { getProtoMessages } from '../../init/loadProto.js';
 import { getGameSession } from '../../session/game.session.js';
 import { config } from '../../config/config.js';
-import { gameSessions, towers, userSessions } from '../../session/sessions.js';
+import { gameSessions, towers, userSessions, monsterSessions } from '../../session/sessions.js';
 import { createStateSyncPacket, serializer } from '../../utils/notification/game.notification.js';
 import { handleError } from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
@@ -10,6 +10,7 @@ import { testConnection } from '../../utils/testConnection/testConnection.js';
 import { getUserBySocket } from '../../session/user.session.js';
 import Tower from '../../classes/models/tower.class.js';
 import { addTower } from '../../session/tower.session.js';
+import { getMonsterByMonsterId } from '../../session/monster.session.js';
 
 // message C2STowerPurchaseRequest {
 //   float x = 1;
@@ -89,25 +90,44 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
 };
 
 export const towerAttackHandler = async ({ socket, payloadData }) => {
-  const protoMessages = getProtoMessages();
-  const request = protoMessages.common.C2STowerAttackRequest;
-  const { towerId, monsterId } = request.decode(payloadData.subarray(2));
+  try {
+    const protoMessages = getProtoMessages();
+    const request = protoMessages.common.C2STowerAttackRequest;
+    const { towerId, monsterId } = request.decode(payloadData.subarray(2));
+    // console.log(`내 타워 아이디: ${towerId}, 공격당하는 몬스터: ${monsterId}`);
 
-  // 게임 세션 및 상대 정보 획득
-  const gameSession = getGameSession(socket.id);
-  if (!gameSession) {
-    throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
+    // 게임 세션 및 상대 정보 획득
+    const gameSession = getGameSession(socket.id);
+    if (!gameSession) {
+      throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
+    }
+    const opponentUser = gameSession.users.find((user) => user.socket !== socket);
+    if (!opponentUser) {
+      throw new Error('상대 유저를 찾지 못했습니다.');
+    }
+    // 제대로된 검증
+    // 1. 해당 유저가 담겨있는 몬스터만 공격가능하게
+    const monster = getMonsterByMonsterId(monsterId);
+    if (!monster) {
+      return;
+    }
+
+    if (socket === monster.getSocket()) {
+      console.log('----------------');
+      console.log(`${opponentUser.id}`);
+      console.log(`${socket.uuid}`);
+      console.log('asdf : ', opponentUser.socket == socket);
+      console.log(socket.uuid, towerId, '가 해당 몬스터 공격당하는 중 => ', monster.getMonsterId());
+      const response = protoMessages.common.GamePacket;
+      const packet = response
+        .encode({ enemyTowerAttackNotification: { towerId: towerId, monsterId: monsterId } })
+        .finish();
+
+      opponentUser.socket.write(
+        serializer(packet, config.packetType.enemyTowerAttackNotification, 1),
+      );
+    }
+  } catch (error) {
+    console.error(error);
   }
-  const opponentUser = gameSession.users.find((user) => user.socket !== socket);
-
-  // 타워가 존재하는지 검증
-  // 몬스터가 존재하는지 검증
-
-  // 상대에게 공격을 알림
-  const response = protoMessages.common.GamePacket;
-  const packet = response
-    .encode({ enemyTowerAttackNotification: { towerId: towerId, monsterId: monsterId } })
-    .finish();
-
-  opponentUser.socket.write(serializer(packet, config.packetType.enemyTowerAttackNotification, 1));
 };

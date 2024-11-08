@@ -24,15 +24,14 @@ const monsterAttackHandler = async ({ socket, payloadData }) => {
   try {
     const protoMessages = getProtoMessages();
     const request = protoMessages.common.C2SMonsterAttackBaseRequest;
-    const { damage } = request.decode(payloadData);
-    console.log('뎃 데미지 : ', request.decode(payloadData));
+    const { damage } = request.decode(payloadData.subarray(3));
 
     const gameSession = getGameSession(socket.id);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }
 
-    const myBaseHp = gameSession.getGameState(socket.uuid).baseHp;
+    let myBaseHp = gameSession.getGameState(socket.uuid).baseHp;
     myBaseHp -= damage;
     gameSession.getGameState(socket.uuid).baseHp = myBaseHp;
     console.log('베이스 체력 : ', myBaseHp);

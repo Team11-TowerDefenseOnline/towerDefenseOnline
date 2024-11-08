@@ -13,6 +13,8 @@ export const initAddTower = (x, y) => {
   const tower = new Tower(towerCount++, x, y);
   towers.push(tower);
 
+  console.log('현재 타워 개수', towerCount - 1);
+
   return tower.getTowerData();
 };
 

@@ -77,9 +77,9 @@ const matchHandler = async ({ socket, payloadData }) => {
           // { towerId: 1, x: 900, y: 300 },
           // { towerId: 2, x: 700, y: 300 },
           // { towerId: 3, x: 500, y: 300 },
-          initAddTower(900, 300),
-          initAddTower(700, 300),
-          initAddTower(500, 300),
+          await initAddTower(900, 300),
+          await initAddTower(700, 300),
+          await initAddTower(500, 300),
         ],
         monsters: [],
         monsterLevel: 1, // 몬스터의 현재 레벨
@@ -120,9 +120,9 @@ const matchHandler = async ({ socket, payloadData }) => {
           // { towerId: 4, x: 900, y: 300 },
           // { towerId: 5, x: 700, y: 300 },
           // { towerId: 6, x: 500, y: 300 },
-          initAddTower(900, 300),
-          initAddTower(700, 300),
-          initAddTower(500, 300),
+          await initAddTower(600, 250),
+          await initAddTower(300, 250),
+          await initAddTower(500, 250),
         ],
         monsters: [
           // 플레이어의 몬스터 목록
@@ -131,32 +131,33 @@ const matchHandler = async ({ socket, payloadData }) => {
         score: 0, // 플레이어의 현재 점수
         monsterPath: [
           // 몬스터 이동 경로
-          { x: 0, y: 250 },
-          { x: 50, y: 250 },
-          { x: 110, y: 250 },
-          { x: 170, y: 250 },
-          { x: 230, y: 250 },
-          { x: 290, y: 250 },
-          { x: 350, y: 250 },
-          { x: 410, y: 250 },
-          { x: 470, y: 250 },
-          { x: 530, y: 250 },
-          { x: 590, y: 250 },
-          { x: 650, y: 250 },
-          { x: 710, y: 250 },
-          { x: 770, y: 250 },
-          { x: 830, y: 250 },
-          { x: 890, y: 250 },
-          { x: 950, y: 250 },
-          { x: 1010, y: 250 },
-          { x: 1070, y: 250 },
-          { x: 1130, y: 250 },
-          { x: 1190, y: 250 },
+          { x: 0, y: 400 },
+          { x: 50, y: 400 },
+          { x: 110, y: 400 },
+          { x: 170, y: 400 },
+          { x: 230, y: 400 },
+          { x: 290, y: 400 },
+          { x: 350, y: 400 },
+          { x: 410, y: 400 },
+          { x: 470, y: 400 },
+          { x: 530, y: 400 },
+          { x: 590, y: 400 },
+          { x: 650, y: 400 },
+          { x: 710, y: 400 },
+          { x: 770, y: 400 },
+          { x: 830, y: 400 },
+          { x: 890, y: 400 },
+          { x: 950, y: 400 },
+          { x: 1010, y: 400 },
+          { x: 1070, y: 400 },
+          { x: 1130, y: 400 },
+          { x: 1190, y: 400 },
         ],
         basePosition: { x: 1370, y: 250 }, // 기지 위치
       };
 
       const response = protoMessages.common.GamePacket;
+
       const packet = response
         .encode({
           matchStartNotification: {
@@ -167,11 +168,21 @@ const matchHandler = async ({ socket, payloadData }) => {
         })
         .finish();
 
+      const packet2 = response
+        .encode({
+          matchStartNotification: {
+            initialGameState: initialGameStateData,
+            playerData: OpponentData,
+            opponentData: PlayerData,
+          },
+        })
+        .finish();
+
       console.log('matchHandler running');
 
       Promise.all([
         users[0].socket.write(serializer(packet, 6, 1)),
-        users[1].socket.write(serializer(packet, 6, 1)),
+        users[1].socket.write(serializer(packet2, 6, 1)),
       ]).then(() => {
         users[0]
           .getIntervalManager()

@@ -45,7 +45,7 @@ const handlers = {
     protoType: 'common.C2STowerAttackRequest',
   },
   [HANDLER_IDS.MONSTER_ATTACK]: {
-    handler: () => monsterAttackHandler,
+    handler: monsterAttackHandler,
     protoType: 'common.C2SMonsterAttackBaseRequest',
   },
   [HANDLER_IDS.MONSTER_DEATH]: {
