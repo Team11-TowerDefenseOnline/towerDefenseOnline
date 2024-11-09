@@ -22,7 +22,6 @@ const stateSyncNotificationHandler = async ({ socket, payloadData }) => {
 
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
-      // gameSession을 삭제할 것
     }
     const user = gameSession.getUser(socket.uuid);
 

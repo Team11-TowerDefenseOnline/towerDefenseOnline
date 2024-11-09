@@ -2,6 +2,7 @@ import {
   createMonsterSpawnPacket,
   createEnemyMonsterSpawnPacket,
   createStateSyncPacket,
+  createGameOverPacket,
 } from '../../utils/notification/game.notification.js';
 import { addMonster } from '../../session/monster.session.js';
 import { getGameSession } from '../../session/game.session.js';
@@ -19,7 +20,9 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     const opponentUser = gameSession.users.find((user) => user.socket !== socket);
 
     if (!opponentUser) {
-      throw new Error('상대 유저를 찾지 못했습니다.');
+      console.log(`(상대가 탈주함) 살아남은 ${socket.uuid}의 승리`);
+      socket.write(createGameOverPacket(true));
+      return;
     }
     const randomMonsterNUmber = Math.floor(Math.random() * 5) + 1;
 

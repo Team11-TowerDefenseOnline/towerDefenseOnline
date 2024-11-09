@@ -83,3 +83,13 @@ export const createStateSyncPacket = (gameSession, userId) => {
 
   return serializer(stateSyncPacket, config.packetType.stateSyncNotification, 1);
 };
+
+export const createGameOverPacket = (isWin) => {
+  const protoMessage = getProtoMessages();
+  const response = protoMessage.common.GamePacket;
+
+  const message = { gameOverNotification: { isWin: isWin } };
+  const packet = response.encode(message).finish();
+
+  return serializer(packet, config.packetType.gameOverNotification, 1);
+};
