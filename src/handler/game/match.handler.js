@@ -70,8 +70,7 @@ const matchHandler = async ({ socket, payloadData }) => {
 
       const PlayerData = {
         gold: 10000, // 현재 골드
-        baseHp: 500, // 기지의 현재 HP
-        maxHp: 500, // 기지의 최대 HP
+        base: { hp: 500, maxHp: 500 }, // 기지의 현재 HP, 최대 HP
         highScore: 0, // 플레이어의 최고 점수
         towers: [
           // { towerId: 1, x: 900, y: 300 },
@@ -113,8 +112,7 @@ const matchHandler = async ({ socket, payloadData }) => {
 
       const OpponentData = {
         gold: 10000, // 현재 골드
-        baseHp: 500, // 기지의 현재 HP
-        maxHp: 500, // 기지의 최대 HP
+        base: { hp: 500, maxHp: 500 }, // 기지의 현재 HP, 최대 HP
         highScore: 0, // 플레이어의 최고 점수
         towers: [
           // { towerId: 4, x: 900, y: 300 },
