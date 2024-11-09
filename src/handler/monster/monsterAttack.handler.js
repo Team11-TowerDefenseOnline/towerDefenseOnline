@@ -3,12 +3,15 @@ import {
   createEnemyMonsterSpawnPacket,
   createStateSyncPacket,
   serializer,
+  createGameOverPacket,
+  createAttackMonsterPacket,
 } from '../../utils/notification/game.notification.js';
 import { addMonster } from '../../session/monster.session.js';
 import { getGameSession } from '../../session/game.session.js';
 import initServer from '../../init/index.js';
 import { getProtoMessages } from '../../init/loadProto.js';
 import { config } from '../../config/config.js';
+import { updateUserScore } from '../../db/user/user.db.js';
 
 // message C2SSpawnMonsterRequest {
 // }
@@ -36,27 +39,20 @@ const monsterAttackHandler = async ({ socket, payloadData }) => {
     gameSession.getGameState(socket.uuid).baseHp = myBaseHp;
     console.log(socket.uuid, '베이스 체력 : ', myBaseHp);
 
-    const response = protoMessages.common.GamePacket;
     const opponentUser = gameSession.users.find((user) => user.socket !== socket);
 
     if (myBaseHp < 0) {
       console.log(`${socket.uuid}의 베이스 체력: ${myBaseHp}`);
+      opponentUser.socket.write(createGameOverPacket(true));
+      socket.write(createGameOverPacket(false));
 
-      const message = { gameOverNotification: { isWin: true } };
-      let packet = response.encode(message).finish();
-      opponentUser.socket.write(serializer(packet, config.packetType.gameOverNotification, 1));
-
-      message.gameOverNotification.isWin = false;
-      packet = response.encode(message).finish();
-      socket.write(serializer(packet, config.packetType.gameOverNotification, 1));
+      const winnerScore = gameSession.getGameState(opponentUser.id).score;
+      if (opponentUser.getHighScore() < winnerScore) {
+        updateUserScore(winnerScore, opponentUser.id);
+      }
     } else {
-      const message = { updateBaseHpNotification: { isOpponent: false, baseHp: myBaseHp } };
-      let packet = response.encode(message).finish();
-      socket.write(serializer(packet, config.packetType.updateBaseHpNotification, 1));
-
-      message.updateBaseHpNotification.isOpponent = true;
-      packet = response.encode(message).finish();
-      opponentUser.socket.write(serializer(packet, config.packetType.updateBaseHpNotification, 1));
+      socket.write(createAttackMonsterPacket(false, myBaseHp));
+      opponentUser.socket.write(createAttackMonsterPacket(true, myBaseHp));
     }
   } catch (error) {
     console.error(error);
