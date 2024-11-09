@@ -11,6 +11,7 @@ import { getGameSession } from '../../session/game.session.js';
 import initServer from '../../init/index.js';
 import { getProtoMessages } from '../../init/loadProto.js';
 import { config } from '../../config/config.js';
+import { updateUserScore } from '../../db/user/user.db.js';
 
 // message C2SSpawnMonsterRequest {
 // }
@@ -38,13 +39,17 @@ const monsterAttackHandler = async ({ socket, payloadData }) => {
     gameSession.getGameState(socket.uuid).baseHp = myBaseHp;
     console.log(socket.uuid, '베이스 체력 : ', myBaseHp);
 
-    const response = protoMessages.common.GamePacket;
     const opponentUser = gameSession.users.find((user) => user.socket !== socket);
 
     if (myBaseHp < 0) {
       console.log(`${socket.uuid}의 베이스 체력: ${myBaseHp}`);
       opponentUser.socket.write(createGameOverPacket(true));
       socket.write(createGameOverPacket(false));
+
+      const winnerScore = gameSession.getGameState(opponentUser.id).score;
+      if (opponentUser.getHighScore() < winnerScore) {
+        updateUserScore(winnerScore, opponentUser.id);
+      }
     } else {
       socket.write(createAttackMonsterPacket(false, myBaseHp));
       opponentUser.socket.write(createAttackMonsterPacket(true, myBaseHp));
