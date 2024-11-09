@@ -3,6 +3,8 @@ import {
   createEnemyMonsterSpawnPacket,
   createStateSyncPacket,
   serializer,
+  createGameOverPacket,
+  createAttackMonsterPacket,
 } from '../../utils/notification/game.notification.js';
 import { addMonster } from '../../session/monster.session.js';
 import { getGameSession } from '../../session/game.session.js';
@@ -41,22 +43,11 @@ const monsterAttackHandler = async ({ socket, payloadData }) => {
 
     if (myBaseHp < 0) {
       console.log(`${socket.uuid}의 베이스 체력: ${myBaseHp}`);
-
-      const message = { gameOverNotification: { isWin: true } };
-      let packet = response.encode(message).finish();
-      opponentUser.socket.write(serializer(packet, config.packetType.gameOverNotification, 1));
-
-      message.gameOverNotification.isWin = false;
-      packet = response.encode(message).finish();
-      socket.write(serializer(packet, config.packetType.gameOverNotification, 1));
+      opponentUser.socket.write(createGameOverPacket(true));
+      socket.write(createGameOverPacket(false));
     } else {
-      const message = { updateBaseHpNotification: { isOpponent: false, baseHp: myBaseHp } };
-      let packet = response.encode(message).finish();
-      socket.write(serializer(packet, config.packetType.updateBaseHpNotification, 1));
-
-      message.updateBaseHpNotification.isOpponent = true;
-      packet = response.encode(message).finish();
-      opponentUser.socket.write(serializer(packet, config.packetType.updateBaseHpNotification, 1));
+      socket.write(createAttackMonsterPacket(false, myBaseHp));
+      opponentUser.socket.write(createAttackMonsterPacket(true, myBaseHp));
     }
   } catch (error) {
     console.error(error);

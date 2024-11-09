@@ -93,3 +93,12 @@ export const createGameOverPacket = (isWin) => {
 
   return serializer(packet, config.packetType.gameOverNotification, 1);
 };
+
+export const createAttackMonsterPacket = (isOpponent, baseHp) => {
+  const protoMessage = getProtoMessages();
+  const response = protoMessage.common.GamePacket;
+
+  const message = { updateBaseHpNotification: { isOpponent: isOpponent, baseHp: baseHp } };
+  const packet = response.encode(message).finish();
+  return serializer(packet, config.packetType.updateBaseHpNotification, 1);
+};
