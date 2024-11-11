@@ -31,12 +31,16 @@ const monsterDeathHendler = async ({ socket, payloadData }) => {
     gameSession.getGameState(socket.uuid).userGold += 100;
     gameSession.getGameState(socket.uuid).score += 1;
 
+    const opponentUser = gameSession.users.find((user) => user.socket !== socket);
+
     const response = protoMessages.common.GamePacket;
     const packet = response
       .encode({ enemyMonsterDeathNotification: { monsterId: monsterId } })
       .finish();
 
-    socket.write(serializer(packet, config.packetType.enemyMonsterDeathNotification, 1));
+    opponentUser.socket.write(
+      serializer(packet, config.packetType.enemyMonsterDeathNotification, 1),
+    );
   } catch (error) {
     console.error(error);
   }
