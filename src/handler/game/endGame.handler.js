@@ -22,10 +22,11 @@ const endGameHandler = async ({ socket, payloadData }) => {
     gameSession.removeUser(socket); // 게임세션에서 유저 제거
 
     // 게임 세션에 남은 사람이 없다면 게임 세션을 제거
-    if (!gameSession.users) {
+    console.log(gameSession.users);
+    if (!gameSession.users.length) {
       removeGameSession(socket.id);
+      console.log(socket.id, '세션이 제거됐습니다.');
     }
-    console.log(socket.id, '세션이 제거됐습니다.');
   } catch (error) {
     console.error(error);
   }
