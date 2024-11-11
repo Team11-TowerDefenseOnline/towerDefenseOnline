@@ -35,5 +35,5 @@ export const getAllTowerBySocket = (socket) => {
 
 // 타워 하나만 찾을 때는 Tower Id 한개만
 export const getTowerByTowerId = (TowerId) => {
-  return towers.find((tower) => tower.id === towerId);
+  return towers.find((tower) => tower.id === TowerId);
 };
