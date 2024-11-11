@@ -79,7 +79,26 @@ export const createStateSyncPacket = (gameSession, userId) => {
   const myGameState = gameSession.getGameStateData(userId);
 
   const stateSyncPacket = stateSync.encode({ stateSyncNotification: myGameState }).finish();
-  console.log('stateSyncPacket : ', stateSync.decode(stateSyncPacket));
+  //console.log('stateSyncPacket : ', stateSync.decode(stateSyncPacket));
 
   return serializer(stateSyncPacket, config.packetType.stateSyncNotification, 1);
+};
+
+export const createGameOverPacket = (isWin) => {
+  const protoMessage = getProtoMessages();
+  const response = protoMessage.common.GamePacket;
+
+  const message = { gameOverNotification: { isWin: isWin } };
+  const packet = response.encode(message).finish();
+
+  return serializer(packet, config.packetType.gameOverNotification, 1);
+};
+
+export const createAttackMonsterPacket = (isOpponent, baseHp) => {
+  const protoMessage = getProtoMessages();
+  const response = protoMessage.common.GamePacket;
+
+  const message = { updateBaseHpNotification: { isOpponent: isOpponent, baseHp: baseHp } };
+  const packet = response.encode(message).finish();
+  return serializer(packet, config.packetType.updateBaseHpNotification, 1);
 };

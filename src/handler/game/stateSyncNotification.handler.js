@@ -25,6 +25,7 @@ const stateSyncNotificationHandler = async ({ socket, payloadData }) => {
     }
     const user = gameSession.getUser(socket.uuid);
 
+    //console.log('gameSession => ', gameSession);
     socket.write(createStateSyncPacket(gameSession, user.id));
   } catch (e) {
     console.error(e);
@@ -32,3 +33,49 @@ const stateSyncNotificationHandler = async ({ socket, payloadData }) => {
 };
 
 export default stateSyncNotificationHandler;
+
+/*
+gold: 10000, // 현재 골드
+        baseHp: 500, // 기지의 현재 HP
+        maxHp: 500, // 기지의 최대 HP
+        highScore: 0, // 플레이어의 최고 점수
+        towers: [
+          // { towerId: 4, x: 900, y: 300 },
+          // { towerId: 5, x: 700, y: 300 },
+          // { towerId: 6, x: 500, y: 300 },
+          initAddTower(900, 300),
+          initAddTower(700, 300),
+          initAddTower(500, 300),
+        ],
+        monsters: [
+          // 플레이어의 몬스터 목록
+        ],
+        monsterLevel: 1, // 몬스터의 현재 레벨
+        score: 0, // 플레이어의 현재 점수
+        monsterPath: [
+          // 몬스터 이동 경로
+          { x: 0, y: 250 },
+          { x: 50, y: 250 },
+          { x: 110, y: 250 },
+          { x: 170, y: 250 },
+          { x: 230, y: 250 },
+          { x: 290, y: 250 },
+          { x: 350, y: 250 },
+          { x: 410, y: 250 },
+          { x: 470, y: 250 },
+          { x: 530, y: 250 },
+          { x: 590, y: 250 },
+          { x: 650, y: 250 },
+          { x: 710, y: 250 },
+          { x: 770, y: 250 },
+          { x: 830, y: 250 },
+          { x: 890, y: 250 },
+          { x: 950, y: 250 },
+          { x: 1010, y: 250 },
+          { x: 1070, y: 250 },
+          { x: 1130, y: 250 },
+          { x: 1190, y: 250 },
+        ],
+        basePosition: { x: 1370, y: 250 }, // 기지 위치
+      };
+      */
