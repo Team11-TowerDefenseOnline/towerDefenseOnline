@@ -15,6 +15,8 @@ export const onData = (socket) => async (data) => {
     const version = socket.buffer.subarray(offset, offset + versionLength).toString();
     offset += versionLength;
 
+    // 버전 검증
+
     const sequence = socket.buffer.readUintBE(offset, config.packet.sequenceLength);
     offset += config.packet.sequenceLength;
 
