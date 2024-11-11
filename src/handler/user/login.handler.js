@@ -8,19 +8,7 @@ import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
 import User from '../../classes/models/user.class.js';
 import { addUser } from '../../session/user.session.js';
-import { RedisManager } from '../../init/redisConnect.js';
-
-// message C2SLoginRequest {
-//     string id = 1;
-//     string password = 2;
-// }
-
-// message S2CLoginResponse {
-//     bool success = 1;
-//     string message = 2;
-//     string token = 3;
-//     GlobalFailCode failCode = 4;
-// }
+import { userSessions } from '../../session/sessions.js';
 
 const loginHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
@@ -72,16 +60,6 @@ const loginHandler = async ({ socket, payloadData }) => {
     const user = new User(socket, isExistUserInDB.userId, isExistUserInDB.highScore);
     // 인메모리 저장
     await addUser(user);
-
-    // redis에 해당 user정보를 저장해둬야함
-    await RedisManager.addUser(user);
-
-    // redis에 저장이 잘 되었는지 불러와보기
-    const userData = await RedisManager.getUser(user.userId);
-    console.log('redis의 유저데이터 =>', userData.userId);
-
-    // const response = protoMessages.common.GamePacket;
-    // const packet = response.encode({ loginResponse: sendPayload }).finish();
   } catch (error) {
     sendPayload = {
       success: false,
@@ -91,7 +69,6 @@ const loginHandler = async ({ socket, payloadData }) => {
     };
 
     console.error(`${socket} : ${error}`);
-    // handleError(socket, error);
   }
 
   socket.write(createLoginPacket(sendPayload));

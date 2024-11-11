@@ -3,12 +3,15 @@ import {
   createEnemyMonsterSpawnPacket,
   createGameOverPacket,
 } from '../../utils/notification/game.notification.js';
-import { addMonster } from '../../session/monster.session.js';
 import { getGameSession } from '../../session/game.session.js';
+import { RedisManager } from '../../init/redisConnect.js';
+import Monster from '../../classes/models/monster.class.js';
+
+let monsterIdCount = 1;
 
 const monsterSpawnHandler = async ({ socket, payloadData }) => {
   try {
-    const gameSession = getGameSession(socket.id);
+    const gameSession = getGameSession(socket.gameId);
 
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
@@ -22,17 +25,20 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
       socket.write(createGameOverPacket(true));
       return;
     }
-    const randomMonsterNUmber = Math.floor(Math.random() * 5) + 1;
+    const randomMonsterNumber = Math.floor(Math.random() * 5) + 1;
 
-    const monster = await addMonster(socket, randomMonsterNUmber);
+    // const monster = await addMonster(socket, randomMonsterNUmber);
+    const monsterData = await RedisManager.addMonster(
+      new Monster(socket.id, monsterIdCount++, randomMonsterNumber),
+    );
 
-    if (!monster) {
-      throw new Error('몬스터 추가가 되지 않습니다.');
+    if (!monsterData) {
+      throw new Error('몬스터 데이터가 추가 되지 않습니다.');
     }
 
     const monsterSpawnPacket = {
-      monsterId: monster.getMonsterId(),
-      monsterNumber: randomMonsterNUmber,
+      monsterId: monsterData.id,
+      monsterNumber: monsterData.number,
     };
 
     Promise.all([

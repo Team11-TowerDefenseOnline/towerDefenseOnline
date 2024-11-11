@@ -5,10 +5,9 @@ import { createGameOverPacket, serializer } from '../../utils/notification/game.
 import { handleError } from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
-import { testConnection } from '../../utils/testConnection/testConnection.js';
-import { getUserBySocket } from '../../session/user.session.js';
 import { addTower } from '../../session/tower.session.js';
 import { getMonsterByMonsterId } from '../../session/monster.session.js';
+import { RedisManager } from '../../init/redisConnect.js';
 
 export const towerPurchaseHandler = async ({ socket, payloadData }) => {
   try {
@@ -17,7 +16,7 @@ export const towerPurchaseHandler = async ({ socket, payloadData }) => {
 
     const { x, y } = request.decode(payloadData.subarray(2));
 
-    const gameSession = getGameSession(socket.id);
+    const gameSession = getGameSession(socket.gameId);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }
@@ -72,7 +71,7 @@ export const towerAttackHandler = async ({ socket, payloadData }) => {
     const { towerId, monsterId } = request.decode(payloadData.subarray(2));
 
     // 게임 세션 및 상대 정보 획득
-    const gameSession = getGameSession(socket.id);
+    const gameSession = getGameSession(socket.gameId);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }
@@ -84,15 +83,15 @@ export const towerAttackHandler = async ({ socket, payloadData }) => {
     }
     // 제대로된 검증
     // 1. 해당 유저가 담겨있는 몬스터만 공격가능하게
-    const monster = getMonsterByMonsterId(monsterId);
-    if (!monster) {
+    const monsterData = await RedisManager.getMonster(monsterId);
+    if (!monsterData) {
       return;
     }
 
-    if (socket === monster.getSocket()) {
+    if (socket.id === monsterData.socketId) {
       const response = protoMessages.common.GamePacket;
       const packet = response
-        .encode({ enemyTowerAttackNotification: { towerId: towerId, monsterId: monsterId } })
+        .encode({ enemyTowerAttackNotification: { towerId: towerId, monsterId: monsterData.id } })
         .finish();
 
       opponentUser.socket.write(

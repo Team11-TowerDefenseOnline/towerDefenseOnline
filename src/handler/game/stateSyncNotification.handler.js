@@ -3,7 +3,7 @@ import { createStateSyncPacket, serializer } from '../../utils/notification/game
 
 const stateSyncNotificationHandler = async ({ socket, payloadData }) => {
   try {
-    const gameSession = getGameSession(socket.id);
+    const gameSession = getGameSession(socket.gameId);
 
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');

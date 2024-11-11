@@ -12,7 +12,7 @@ const monsterAttackHandler = async ({ socket, payloadData }) => {
     const request = protoMessages.common.C2SMonsterAttackBaseRequest;
     const { damage } = request.decode(payloadData.subarray(3));
 
-    const gameSession = getGameSession(socket.id);
+    const gameSession = getGameSession(socket.gameId);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }

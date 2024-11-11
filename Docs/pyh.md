@@ -73,7 +73,7 @@ export const RedisManager = {
   addUser: async (user) => {
     try {
       const userData = {
-        socketId: user.socket.id,
+        socketId: user.socket.gameId,
         userId: user.id,
         highScore: user.highScore,
         jwt: user.socket.token,

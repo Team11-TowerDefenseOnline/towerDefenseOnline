@@ -13,7 +13,6 @@ const initServer = async () => {
     await loadProtos();
     await loadGameAssets();
     console.log(redisClient.status);
-    redisClient.set('a', 'a');
     const gameId = uuidv4();
     const gameSession = addGameSession(gameId);
     console.log(gameSession);

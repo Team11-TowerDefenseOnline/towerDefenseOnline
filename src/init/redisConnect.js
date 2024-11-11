@@ -45,6 +45,74 @@ export const connectRedis = async () => {
 await connectRedis();
 
 export const RedisManager = {
+  addMonster: async (monster) => {
+    try {
+      const monsterData = {
+        socketId: monster.socketId,
+        id: monster.id,
+        number: monster.number,
+      };
+
+      await redisClient.set(`monster:${monster.id}`, JSON.stringify(monsterData));
+
+      return monsterData;
+    } catch (error) {
+      console.error('Redis에 몬스터 정보 저장 중 오류 발생:', error);
+    }
+  },
+
+  getMonster: async (monsterId) => {
+    try {
+      // Redis에서 저장된 유저 데이터를 가져옴
+      const monsterDataString = await redisClient.get(`monster:${monsterId}`);
+      // if (Object.keys(monsterDataString).length === 0) {
+      //   console.log(`유저 정보가 Redis에 존재하지 않습니다: monster:${monsterId}`);
+      //   return null;
+      // }
+
+      const monsterData = JSON.parse(monsterDataString);
+
+      return monsterData;
+    } catch (error) {
+      console.error('Redis에서 유저 정보 불러오기 중 오류 발생:', error);
+      return null;
+    }
+  },
+
+  deleteMonster: async (monsterId) => {
+    try {
+      await redisClient.del(`monster:${monsterId}`);
+
+      console.log(`몬스터 캐시가 삭제되었습니다: monster:${monsterId}`);
+      return null;
+    } catch (error) {
+      console.error('Redis에서 유저 캐시 삭제 중 오류 발생: ', error);
+      return null;
+    }
+  },
+
+  deleteMonsterCacheMemory: async (socketId) => {
+    try {
+      // Redis에서 모든 몬스터 데이터를 조회
+      const keys = await redisClient.keys('monster:*');
+
+      for (const key of keys) {
+        const monsterDataString = await redisClient.get(key);
+        const monsterData = JSON.parse(monsterDataString);
+
+        // socketId가 일치하는 몬스터를 삭제
+        if (monsterData.socketId === socketId) {
+          await redisClient.del(key);
+          console.log(`몬스터 캐시가 삭제되었습니다: ${key}`);
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Redis에서 몬스터 캐시 삭제 중 오류 발생: ', error);
+      return null;
+    }
+  },
+
   addUser: async (user) => {
     try {
       const userData = {
@@ -72,7 +140,7 @@ export const RedisManager = {
         console.log(`유저 정보가 Redis에 존재하지 않습니다: user:${userId}`);
         return null;
       }
-      console.log(`유저 정보 불러오기 성공: user:${userId}`, userData);
+
       return userData;
     } catch (error) {
       console.error('Redis에서 유저 정보 불러오기 중 오류 발생:', error);
@@ -104,7 +172,6 @@ export const RedisManager = {
         return null;
       }
 
-      console.log(`유저 정보 불러오기 성공: user:${userId}`, userData);
       return userData;
     } catch (error) {
       console.error('Redis에서 유저 정보 불러오기 중 오류 발생:', error);
@@ -122,34 +189,6 @@ export const RedisManager = {
     } catch (error) {
       console.error('Redis에서 유저 캐시 삭제 중 오류 발생: ', error);
       return false;
-    }
-  },
-
-  setCache: async (key, value, expiration = 3600) => {
-    try {
-      await redisClient.set(key, JSON.stringify(value), 'EX', expiration);
-      console.log(`캐시 설정 완료: ${key}`);
-    } catch (error) {
-      console.error('캐시 설정 중 오류 발생:', error);
-    }
-  },
-
-  getCache: async (key) => {
-    try {
-      const data = await redisClient.get(key);
-      return data ? JSON.parse(data) : null;
-    } catch (error) {
-      console.error('캐시 가져오기 중 오류 발생:', error);
-      return null;
-    }
-  },
-
-  deleteCache: async (key) => {
-    try {
-      await redisClient.del(key);
-      console.log(`캐시 삭제 완료: ${key}`);
-    } catch (error) {
-      console.error('캐시 삭제 중 오류 발생:', error);
     }
   },
 
