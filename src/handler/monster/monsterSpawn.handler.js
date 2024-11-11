@@ -18,6 +18,7 @@ const monsterSpawnHandler = async ({ socket, payloadData }) => {
     }
 
     const opponentUser = gameSession.users.find((user) => user.socket !== socket);
+    // 해당 게임의 내가 아닌 다른 유저의 소켓을 찾아서 opponentUser(상대방) 소켓에 넣는다.
 
     if (!opponentUser) {
       console.log(`(상대가 탈주함) 살아남은 ${socket.uuid}의 승리`);

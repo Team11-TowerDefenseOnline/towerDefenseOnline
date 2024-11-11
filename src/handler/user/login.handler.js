@@ -4,13 +4,13 @@ import jwt from 'jsonwebtoken';
 import { getProtoMessages } from '../../init/loadProto.js';
 import { getGameSession } from '../../session/game.session.js';
 import { config } from '../../config/config.js';
-import { gameSessions, userSessions } from '../../session/sessions.js';
+import { gameSessions, matchSessions, userSessions } from '../../session/sessions.js';
 import { createLoginPacket, serializer } from '../../utils/notification/game.notification.js';
 import { handleError } from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
 import User from '../../classes/models/user.class.js';
-import { addUser } from '../../session/user.session.js';
+import { addUser, getUserBySocket } from '../../session/user.session.js';
 import { redisClient } from '../../init/redisConnect.js';
 
 // message C2SLoginRequest {
@@ -48,6 +48,11 @@ const loginHandler = async ({ socket, payloadData }) => {
       throw new CustomError(ErrorCodes.PASSWORD_NOT_MATCH, '비밀번호가 틀립니다.');
     }
 
+    // 이미 로그인 된 ID가 userSessions에 있으면 그 ID로 로그인 시 접속에러 띄우기
+    if (userSessions.find((user) => user.id === id)) {
+      throw new CustomError(ErrorCodes.ALREADY_LOGGED_IN, '이미 로그인된 아이디입니다.');
+    }
+
     // 로그인 시점 갱신
     await updateUserLogin(isExistUserInDB.userId); // jwt 생성
 
@@ -70,6 +75,9 @@ const loginHandler = async ({ socket, payloadData }) => {
     const user = new User(socket, isExistUserInDB.userId, isExistUserInDB.highScore);
     // redis에 해당 user정보를 저장해둬야함
     await addUser(user);
+
+    // 로그인한 id를 userSessions에 저장
+    userSessions.push({ id: isExistUserInDB.userId });
 
     // const response = protoMessages.common.GamePacket;
     // const packet = response.encode({ loginResponse: sendPayload }).finish();
