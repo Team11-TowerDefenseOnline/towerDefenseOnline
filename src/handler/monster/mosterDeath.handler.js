@@ -25,7 +25,6 @@ const monsterDeathHendler = async ({ socket, payloadData }) => {
       return;
     }
     const deathMonster = removeMonster(monsterId);
-    console.log(monsterId, '가 사망함.');
 
     // 몬스터 잡을 시 돈 및 점수 획득
     gameSession.getGameState(socket.uuid).userGold += 100;

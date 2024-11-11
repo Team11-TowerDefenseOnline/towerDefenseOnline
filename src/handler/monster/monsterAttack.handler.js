@@ -1,28 +1,11 @@
 import {
-  createMonsterSpawnPacket,
-  createEnemyMonsterSpawnPacket,
-  createStateSyncPacket,
-  serializer,
   createGameOverPacket,
   createAttackMonsterPacket,
 } from '../../utils/notification/game.notification.js';
-import { addMonster } from '../../session/monster.session.js';
 import { getGameSession } from '../../session/game.session.js';
-import initServer from '../../init/index.js';
 import { getProtoMessages } from '../../init/loadProto.js';
-import { config } from '../../config/config.js';
 import { updateUserScore } from '../../db/user/user.db.js';
 
-// message C2SSpawnMonsterRequest {
-// }
-// message S2CSpawnMonsterResponse {
-//     int32 monsterId = 1;
-//     int32 monsterNumber = 2;
-// }
-// message S2CSpawnEnemyMonsterNotification {
-//   int32 monsterId = 1;
-//   int32 monsterNumber = 2;
-// }
 const monsterAttackHandler = async ({ socket, payloadData }) => {
   try {
     const protoMessages = getProtoMessages();
@@ -37,12 +20,10 @@ const monsterAttackHandler = async ({ socket, payloadData }) => {
     let myBaseHp = gameSession.getGameState(socket.uuid).baseHp;
     myBaseHp -= damage;
     gameSession.getGameState(socket.uuid).baseHp = myBaseHp;
-    console.log(socket.uuid, '베이스 체력 : ', myBaseHp);
 
     const opponentUser = gameSession.users.find((user) => user.socket !== socket);
 
     if (myBaseHp < 0) {
-      console.log(`${socket.uuid}의 베이스 체력: ${myBaseHp}`);
       opponentUser.socket.write(createGameOverPacket(true));
       socket.write(createGameOverPacket(false));
 
