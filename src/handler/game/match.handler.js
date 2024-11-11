@@ -1,17 +1,12 @@
 import { getProtoMessages } from '../../init/loadProto.js';
-import { addGameSession, getGameSession } from '../../session/game.session.js';
-import { config } from '../../config/config.js';
-import { gameSessions, matchSessions, userSessions } from '../../session/sessions.js';
-import { createStateSyncPacket, serializer } from '../../utils/notification/game.notification.js';
-import { handleError } from '../../utils/errors/errorHandler.js';
-import CustomError from '../../utils/errors/customError.js';
-import { ErrorCodes } from '../../utils/errors/errorCodes.js';
-import { testConnection } from '../../utils/testConnection/testConnection.js';
+import { addGameSession } from '../../session/game.session.js';
+import { matchSessions } from '../../session/sessions.js';
+import { serializer } from '../../utils/notification/game.notification.js';
 import { getUserBySocket } from '../../session/user.session.js';
 import { addUserInMatchSession } from '../../session/match.session.js';
 import { initAddTower } from '../../session/tower.session.js';
-import IntervalManager from '../../classes/managers/interval.manager.js';
 import stateSyncNotificationHandler from './stateSyncNotification.handler.js';
+import { RedisManager } from '../../init/redisConnect.js';
 
 // message S2CMatchStartNotification {
 //     InitialGameState initialGameState = 1;

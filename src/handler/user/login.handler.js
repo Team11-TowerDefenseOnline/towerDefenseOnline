@@ -2,16 +2,13 @@ import { findUserByUserID, updateUserLogin } from '../../db/user/user.db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { getProtoMessages } from '../../init/loadProto.js';
-import { getGameSession } from '../../session/game.session.js';
 import { config } from '../../config/config.js';
-import { gameSessions, userSessions } from '../../session/sessions.js';
-import { createLoginPacket, serializer } from '../../utils/notification/game.notification.js';
-import { handleError } from '../../utils/errors/errorHandler.js';
+import { createLoginPacket } from '../../utils/notification/game.notification.js';
 import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
 import User from '../../classes/models/user.class.js';
 import { addUser } from '../../session/user.session.js';
-import { redisClient } from '../../init/redisConnect.js';
+import { RedisManager } from '../../init/redisConnect.js';
 
 // message C2SLoginRequest {
 //     string id = 1;
@@ -68,8 +65,15 @@ const loginHandler = async ({ socket, payloadData }) => {
     };
 
     const user = new User(socket, isExistUserInDB.userId, isExistUserInDB.highScore);
-    // redis에 해당 user정보를 저장해둬야함
+    // 인메모리 저장
     await addUser(user);
+
+    // redis에 해당 user정보를 저장해둬야함
+    await RedisManager.addUser(user);
+
+    // redis에 저장이 잘 되었는지 불러와보기
+    const userData = await RedisManager.getUser(user.userId);
+    console.log('redis의 유저데이터 =>', userData.userId);
 
     // const response = protoMessages.common.GamePacket;
     // const packet = response.encode({ loginResponse: sendPayload }).finish();

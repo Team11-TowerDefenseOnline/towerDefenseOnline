@@ -45,6 +45,86 @@ export const connectRedis = async () => {
 await connectRedis();
 
 export const RedisManager = {
+  addUser: async (user) => {
+    try {
+      const userData = {
+        socket: user.socket,
+        userId: user.id,
+        highScore: user.highScore,
+        jwt: user.socket.token,
+      };
+
+      // Redis에 Hash 형식으로 저장
+      await redisClient.hmset(`user:${user.userId}`, userData);
+
+      await redisClient.set(`socket:${user.socket.id}`, user.id);
+      console.log(`유저 정보가 Redis에 저장되었습니다: user:${user.userId}`);
+    } catch (error) {
+      console.error('Redis에 유저 정보 저장 중 오류 발생:', error);
+    }
+  },
+
+  getUser: async (userId) => {
+    try {
+      // Redis에서 저장된 유저 데이터를 가져옴
+      const userData = await redisClient.hgetall(`user:${userId}`);
+      if (Object.keys(userData).length === 0) {
+        console.log(`유저 정보가 Redis에 존재하지 않습니다: user:${userId}`);
+        return null;
+      }
+      console.log(`유저 정보 불러오기 성공: user:${userId}`, userData);
+      return userData;
+    } catch (error) {
+      console.error('Redis에서 유저 정보 불러오기 중 오류 발생:', error);
+      return null;
+    }
+  },
+  getUserIdBySocket: async (socket) => {
+    try {
+      const userId = await redisClient.get(`socket:${socket.id}`);
+      if (!userId) {
+        console.log(`socket:${socket.id}에 대한 userId를 찾을 수 없습니다.`);
+        return null;
+      }
+      return userId;
+    } catch (error) {
+      console.error(`socket:${socket.id}에 대한 userId를 찾을 수 없습니다.`);
+      return null;
+    }
+  },
+  getUserBySocket: async (socket) => {
+    try {
+      const userId = getUserIdBySocket(socket);
+
+      // userId로 유저 데이터 불러오기
+      // 이부분 아직테스트 못함 안되면 redisClient.hegetall써야함
+      const userData = getUser(userId);
+      if (Object.keys(userData).length === 0) {
+        console.log(`유저 정보가 Redis에 존재하지 않습니다: user:${userId}`);
+        return null;
+      }
+
+      console.log(`유저 정보 불러오기 성공: user:${userId}`, userData);
+      return userData;
+    } catch (error) {
+      console.error('Redis에서 유저 정보 불러오기 중 오류 발생:', error);
+      return null;
+    }
+  },
+  deleteUserCacheMemory: async (socket) => {
+    try {
+      const userId = getUserIdBySocket(socket);
+
+      Promise.all([redisClient.del(`user:${userId}`), redisClient.del(`socket:${socket.id}`)]);
+
+      console.log(`유저 캐시가 삭제되었습니다: user:${userId} 및 socket:${socket.id}`);
+      return true;
+    } catch (error) {
+      console.error('Redis에서 유저 캐시 삭제 중 오류 발생: ', error);
+      return false;
+    }
+  },
+
   setCache: async (key, value, expiration = 3600) => {
     try {
       await redisClient.set(key, JSON.stringify(value), 'EX', expiration);
