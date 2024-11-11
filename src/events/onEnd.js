@@ -1,4 +1,5 @@
 import { getGameSession, removeGameSession } from '../session/game.session.js';
+import { userSessions } from '../session/sessions.js';
 import { getUserBySocket, removeUser } from '../session/user.session.js';
 
 // 클라이언트 종료시 작동하는 이벤트
@@ -26,11 +27,12 @@ export const onEnd = (socket) => async () => {
       if (!gameSession.users) {
         removeGameSession(socket.id);
       }
+      removeUser(socket);
     } else {
     } // 게임 세션에 참가 안한채로 종료한 경우
   } catch (error) {
     throw new Error(`클라이언트 종료 중 알 수 없는 에러 ${error}`);
   }
 
-  console.log('클라이언트 연결이 종료되었습니다.');
+  console.log('클라이언트 연결이 종료되었습니다.', userSessions);
 };
