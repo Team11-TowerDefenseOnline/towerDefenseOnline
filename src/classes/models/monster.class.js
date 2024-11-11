@@ -31,6 +31,14 @@ class Monster {
     this.Atk = realMonster.Atk;
     this.AtkPerLv = realMonster.AtkPerLv;
   }
+
+  getMonsterId() {
+    return this.id;
+  }
+
+  getSocket() {
+    return this.socket;
+  }
 }
 
 export default Monster;

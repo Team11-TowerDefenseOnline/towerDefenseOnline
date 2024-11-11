@@ -6,6 +6,10 @@ import loginHandler from './user/login.handler.js';
 import registerHandler from './user/register.handler.js';
 import monsterSpawnHandler from './monster/monsterSpawn.handler.js';
 import { towerAttackHandler, towerPurchaseHandler } from './game/tower.handler.js';
+import stateSyncNotificationHandler from './game/stateSyncNotification.handler.js';
+import monsterAttackHandler from './monster/monsterAttack.handler.js';
+import monsterDeathHendler from './monster/mosterDeath.handler.js';
+import endGameHandler from './game/endGame.handler.js';
 
 const handlers = {
   [HANDLER_IDS.INITIAL]: {
@@ -24,6 +28,10 @@ const handlers = {
     handler: matchHandler,
     protoType: 'common.matchRequest',
   },
+  [HANDLER_IDS.SYNC]: {
+    handler: stateSyncNotificationHandler,
+    protoType: 'common.S2CStateSyncNotification',
+  },
   [HANDLER_IDS.PURCHASE]: {
     handler: towerPurchaseHandler,
     protoType: 'common.C2STowerPurchaseRequest',
@@ -35,6 +43,18 @@ const handlers = {
   [HANDLER_IDS.TOWER_ATTACK]: {
     handler: towerAttackHandler,
     protoType: 'common.C2STowerAttackRequest',
+  },
+  [HANDLER_IDS.MONSTER_ATTACK]: {
+    handler: monsterAttackHandler,
+    protoType: 'common.C2SMonsterAttackBaseRequest',
+  },
+  [HANDLER_IDS.MONSTER_DEATH]: {
+    handler: monsterDeathHendler,
+    protoType: 'common.C2SMonsterAttackBaseRequest',
+  },
+  [HANDLER_IDS.GAME_END]: {
+    handler: endGameHandler,
+    protoType: 'common.C2SGameEndRequest ',
   },
 };
 

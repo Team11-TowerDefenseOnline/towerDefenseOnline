@@ -1,4 +1,4 @@
-import { createPingPacket } from '../../utils/notification/game.notification.js';
+import IntervalManager from '../managers/interval.manager.js';
 
 class User {
   constructor(socket, id, highScore) {
@@ -8,17 +8,7 @@ class User {
     this.lastUpdateTime = Date.now();
     this.highScore = highScore || 0;
     this.gold = 0;
-  }
-
-  ping() {
-    const now = Date.now();
-    this.socket.write(createPingPacket(now));
-  }
-
-  handlePong(data) {
-    const now = Date.now();
-    this.latency = (now - data.timestamp) / 2;
-    console.log(`pong ${this.id} : ${now} with latency ${this.latency}ms`);
+    this.intervalManager = new IntervalManager();
   }
 
   setHighScore(highScore) {
@@ -27,6 +17,10 @@ class User {
 
   getHighScore() {
     return this.highScore;
+  }
+
+  getIntervalManager() {
+    return this.intervalManager;
   }
 }
 
