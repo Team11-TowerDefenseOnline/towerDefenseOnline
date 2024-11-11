@@ -45,6 +45,7 @@ class IntervalManager extends BaseManager {
     this.intervals.forEach((userIntervals) => {
       userIntervals.forEach((intervalId) => clearInterval(intervalId));
     });
+    console.log('intervals Clear All');
   }
 }
 

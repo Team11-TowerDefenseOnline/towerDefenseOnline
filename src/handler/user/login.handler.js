@@ -45,6 +45,11 @@ const loginHandler = async ({ socket, payloadData }) => {
       throw new CustomError(ErrorCodes.PASSWORD_NOT_MATCH, '비밀번호가 틀립니다.');
     }
 
+    // 이미 로그인 된 ID가 userSessions에 있으면 그 ID로 로그인 시 접속에러 띄우기
+    if (userSessions.find((user) => user.id === id)) {
+      throw new CustomError(ErrorCodes.ALREADY_LOGGED_IN, '이미 로그인된 아이디입니다.');
+    }
+
     // 로그인 시점 갱신
     await updateUserLogin(isExistUserInDB.userId); // jwt 생성
 
