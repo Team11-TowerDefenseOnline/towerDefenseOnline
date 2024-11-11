@@ -2,7 +2,11 @@ import { getProtoMessages } from '../../init/loadProto.js';
 import { getGameSession } from '../../session/game.session.js';
 import { config } from '../../config/config.js';
 import { gameSessions, towers, userSessions, monsterSessions } from '../../session/sessions.js';
-import { createStateSyncPacket, serializer } from '../../utils/notification/game.notification.js';
+import {
+  createGameOverPacket,
+  createStateSyncPacket,
+  serializer,
+} from '../../utils/notification/game.notification.js';
 import { handleError } from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
@@ -103,7 +107,9 @@ export const towerAttackHandler = async ({ socket, payloadData }) => {
     }
     const opponentUser = gameSession.users.find((user) => user.socket !== socket);
     if (!opponentUser) {
-      throw new Error('상대 유저를 찾지 못했습니다.');
+      console.log(`(상대가 탈주함) 살아남은 ${socket.uuid}의 승리`);
+      socket.write(createGameOverPacket(true));
+      return;
     }
     // 제대로된 검증
     // 1. 해당 유저가 담겨있는 몬스터만 공격가능하게
