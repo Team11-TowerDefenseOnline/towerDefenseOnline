@@ -1,5 +1,5 @@
 import { getGameSession, removeGameSession } from '../session/game.session.js';
-import { removeUser } from '../session/user.session.js';
+import { getUserBySocket, removeUser } from '../session/user.session.js';
 
 // 클라이언트 종료시 작동하는 이벤트
 export const onEnd = (socket) => async () => {
@@ -8,7 +8,13 @@ export const onEnd = (socket) => async () => {
   // 클라이언트가 참가 중이던 게임 세션을 제거해야함.
   // 상대가 탈주해서 세션이 제거된 경우 상대에게 상대가 탈주함을 알리고 메인화면으로 보내줘야함.
   try {
+    // 게임 한판 한뒤 종료하는 경우: socket.id가 이미 있음으로.
     const gameSession = getGameSession(socket.id);
+    if (!gameSession) {
+      console.log('클라이언트 연결이 종료되었습니다.');
+      return;
+    }
+
     // 게임 세션에 참가한 경우
     if (socket.id) {
       const user = gameSession.getUser(socket.uuid);
