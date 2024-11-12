@@ -39,7 +39,7 @@ const loginHandler = async ({ socket, payloadData }) => {
     }
 
     // 로그인 시점 갱신
-    await updateUserLogin(isExistUserInDB.userId); // jwt 생성
+    await updateUserLogin(isExistUserInDB.userId); // jwt 생성A
 
     const token = jwt.sign(
       {
@@ -57,7 +57,7 @@ const loginHandler = async ({ socket, payloadData }) => {
       failCode: failCode.values.NONE,
     };
 
-    const user = new User(socket, isExistUserInDB.userId, isExistUserInDB.highScore);
+    const user = new User(socket, isExistUserInDB.userId, isExistUserInDB.score);
     // 인메모리 저장
     await addUser(user);
   } catch (error) {
