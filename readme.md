@@ -1,6 +1,7 @@
 # Tower Defense Online Project
 
-<img src="images/example.png" alt="실제 인게임 화면" width="400"/>
+![image](https://github.com/user-attachments/assets/786cb6c2-668e-4c5e-b0d3-d0d18836858b)
+
 
 ## 소개
 
