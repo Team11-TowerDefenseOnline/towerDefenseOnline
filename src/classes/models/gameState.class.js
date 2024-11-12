@@ -4,7 +4,7 @@ class GameState {
     this.userGold = userGold;
     this.baseHp = baseHp;
     this.score = 0;
-    this.monsterLevel = 10;
+    this.monsterLevel = 1;
     this.towers = towers;
     this.monsters = monsters;
   }

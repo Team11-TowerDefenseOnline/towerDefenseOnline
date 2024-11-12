@@ -8,6 +8,8 @@ import { getGameSession } from '../../session/game.session.js';
 import { getProtoMessages } from '../../init/loadProto.js';
 import { config } from '../../config/config.js';
 import { getMonsterByMonsterId, removeMonster } from '../../session/monster.session.js';
+import { RedisManager } from '../../init/redisConnect.js';
+import { getUserBySocket } from '../../session/user.session.js';
 
 const monsterDeathHendler = async ({ socket, payloadData }) => {
   try {
@@ -20,15 +22,16 @@ const monsterDeathHendler = async ({ socket, payloadData }) => {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }
 
-    if (!getMonsterByMonsterId(monsterId)) {
+    if (!RedisManager.getMonster(monsterId)) {
       console.error('몬스터가 이미 죽었습니다.');
       return;
     }
-    const deathMonster = removeMonster(monsterId);
+    const deathMonster = RedisManager.deleteMonster(monsterId);
 
     // 몬스터 잡을 시 돈 및 점수 획득
-    gameSession.getGameState(socket.uuid).userGold += 100;
-    gameSession.getGameState(socket.uuid).score += 1;
+    const user = getUserBySocket(socket);
+    gameSession.getGameState(user.id).userGold += 100;
+    gameSession.getGameState(user.id).score += 1;
 
     const opponentUser = gameSession.users.find((user) => user.socket !== socket);
 

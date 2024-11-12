@@ -25,7 +25,7 @@ class Game {
   //userId, gold, base, score, towers, monsters
   addNewGameState(userId) {
     const initGold = 10000;
-    const initBaseHp = 500;
+    const initBaseHp = 200;
     const towers = [
       { towerId: 4, x: 900, y: 300 },
       { towerId: 5, x: 900, y: 100 },

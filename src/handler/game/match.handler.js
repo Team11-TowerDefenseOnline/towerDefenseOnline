@@ -41,15 +41,15 @@ const matchHandler = async ({ socket, payloadData }) => {
     // 임시코드
     try {
       const initialGameStateData = {
-        baseHp: 500,
+        baseHp: 200,
         towerCost: 200,
         initialGold: 10000,
         monsterSpawnInterval: 1000,
       };
 
       const baseData = {
-        hp: 500,
-        maxHp: 500,
+        hp: 200,
+        maxHp: 200,
       };
 
       const positionData = {
