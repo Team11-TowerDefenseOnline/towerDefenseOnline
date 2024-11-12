@@ -1,4 +1,14 @@
-import { PORT, HOST, CLIENT_VERSION, JWT_SECRET } from '../constants/env.js';
+import {
+  PORT,
+  HOST,
+  CLIENT_VERSION,
+  JWT_SECRET,
+  REDIS_URL,
+  REDIS_PORT,
+  REDIS_HOST,
+  REDIS_PASSWORD,
+  REDIS_FAMILY,
+} from '../constants/env.js';
 import {
   PACKET_TYPE_LENGTH,
   PACKET_TYPE,
@@ -9,6 +19,13 @@ import {
 import { DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT } from '../constants/env.js';
 
 export const config = {
+  redis: {
+    url: REDIS_URL,
+    port: REDIS_PORT,
+    host: REDIS_HOST,
+    password: REDIS_PASSWORD,
+    family: REDIS_FAMILY,
+  },
   jwt: {
     jwtSecret: JWT_SECRET,
   },

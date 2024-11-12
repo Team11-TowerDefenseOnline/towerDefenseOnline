@@ -15,7 +15,7 @@ const monsterDeathHendler = async ({ socket, payloadData }) => {
     const request = protoMessages.common.C2SMonsterDeathNotification;
     const { monsterId } = request.decode(payloadData.subarray(3));
 
-    const gameSession = getGameSession(socket.id);
+    const gameSession = getGameSession(socket.gameId);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션을 찾지 못했습니다.');
     }
@@ -25,18 +25,21 @@ const monsterDeathHendler = async ({ socket, payloadData }) => {
       return;
     }
     const deathMonster = removeMonster(monsterId);
-    console.log(monsterId, '가 사망함.');
 
     // 몬스터 잡을 시 돈 및 점수 획득
     gameSession.getGameState(socket.uuid).userGold += 100;
     gameSession.getGameState(socket.uuid).score += 1;
+
+    const opponentUser = gameSession.users.find((user) => user.socket !== socket);
 
     const response = protoMessages.common.GamePacket;
     const packet = response
       .encode({ enemyMonsterDeathNotification: { monsterId: monsterId } })
       .finish();
 
-    socket.write(serializer(packet, config.packetType.enemyMonsterDeathNotification, 1));
+    opponentUser.socket.write(
+      serializer(packet, config.packetType.enemyMonsterDeathNotification, 1),
+    );
   } catch (error) {
     console.error(error);
   }

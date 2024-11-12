@@ -2,28 +2,13 @@ import { findUserByUserID, updateUserLogin } from '../../db/user/user.db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { getProtoMessages } from '../../init/loadProto.js';
-import { getGameSession } from '../../session/game.session.js';
 import { config } from '../../config/config.js';
-import { gameSessions, userSessions } from '../../session/sessions.js';
-import { createLoginPacket, serializer } from '../../utils/notification/game.notification.js';
-import { handleError } from '../../utils/errors/errorHandler.js';
+import { createLoginPacket } from '../../utils/notification/game.notification.js';
 import CustomError from '../../utils/errors/customError.js';
 import { ErrorCodes } from '../../utils/errors/errorCodes.js';
 import User from '../../classes/models/user.class.js';
 import { addUser } from '../../session/user.session.js';
-import { redisClient } from '../../init/redisConnect.js';
-
-// message C2SLoginRequest {
-//     string id = 1;
-//     string password = 2;
-// }
-
-// message S2CLoginResponse {
-//     bool success = 1;
-//     string message = 2;
-//     string token = 3;
-//     GlobalFailCode failCode = 4;
-// }
+import { userSessions } from '../../session/sessions.js';
 
 const loginHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
@@ -48,6 +33,11 @@ const loginHandler = async ({ socket, payloadData }) => {
       throw new CustomError(ErrorCodes.PASSWORD_NOT_MATCH, '비밀번호가 틀립니다.');
     }
 
+    // 이미 로그인 된 ID가 userSessions에 있으면 그 ID로 로그인 시 접속에러 띄우기
+    if (userSessions.find((user) => user.id === id)) {
+      throw new CustomError(ErrorCodes.ALREADY_LOGGED_IN, '이미 로그인된 아이디입니다.');
+    }
+
     // 로그인 시점 갱신
     await updateUserLogin(isExistUserInDB.userId); // jwt 생성
 
@@ -68,11 +58,8 @@ const loginHandler = async ({ socket, payloadData }) => {
     };
 
     const user = new User(socket, isExistUserInDB.userId, isExistUserInDB.highScore);
-    // redis에 해당 user정보를 저장해둬야함
+    // 인메모리 저장
     await addUser(user);
-
-    // const response = protoMessages.common.GamePacket;
-    // const packet = response.encode({ loginResponse: sendPayload }).finish();
   } catch (error) {
     sendPayload = {
       success: false,
@@ -82,7 +69,6 @@ const loginHandler = async ({ socket, payloadData }) => {
     };
 
     console.error(`${socket} : ${error}`);
-    // handleError(socket, error);
   }
 
   socket.write(createLoginPacket(sendPayload));

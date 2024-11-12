@@ -1,8 +1,5 @@
 import { config } from '../config/config.js';
-import { packetParser } from '../utils/parser/packetParser.js';
 import { getHandlerById } from '../handler/index.js';
-import { getProtoMessages } from '../init/loadProto.js';
-import { getUserBySocket } from '../session/user.session.js';
 
 // 클라이언트의 패킷이 도착했을 때 파싱함.
 // 핸들러를 통해 패킷 타입에 맞는 함수를 동작시킴.
@@ -18,6 +15,8 @@ export const onData = (socket) => async (data) => {
     const version = socket.buffer.subarray(offset, offset + versionLength).toString();
     offset += versionLength;
 
+    // 버전 검증
+
     const sequence = socket.buffer.readUintBE(offset, config.packet.sequenceLength);
     offset += config.packet.sequenceLength;
 
@@ -31,7 +30,6 @@ export const onData = (socket) => async (data) => {
 
       try {
         const handler = getHandlerById(packetType);
-
         handler({ socket, payloadData });
       } catch (e) {
         console.error(e);

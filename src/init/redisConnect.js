@@ -1,9 +1,13 @@
 import Redis from 'ioredis';
-import dotenv from 'dotenv';
+import { config } from '../config/config.js';
 
-dotenv.config();
-
-export const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+export const redisClient = new Redis({
+  port: config.redis.port, // Redis port
+  host: config.redis.host, // Redis host
+  family: config.redis.family, // 4(IPv4) or 6(IPv6)
+  password: config.redis.password,
+  db: 0,
+});
 
 redisClient.on('error', (err) => {
   console.error('Redis 클라이언트 오류:', err.errno);
@@ -41,31 +45,150 @@ export const connectRedis = async () => {
 await connectRedis();
 
 export const RedisManager = {
-  setCache: async (key, value, expiration = 3600) => {
+  addMonster: async (monster) => {
     try {
-      await redisClient.set(key, JSON.stringify(value), 'EX', expiration);
-      console.log(`캐시 설정 완료: ${key}`);
+      const monsterData = {
+        socketId: monster.socketId,
+        id: monster.id,
+        number: monster.number,
+      };
+
+      await redisClient.set(`monster:${monster.id}`, JSON.stringify(monsterData));
+
+      return monsterData;
     } catch (error) {
-      console.error('캐시 설정 중 오류 발생:', error);
+      console.error('Redis에 몬스터 정보 저장 중 오류 발생:', error);
     }
   },
 
-  getCache: async (key) => {
+  getMonster: async (monsterId) => {
     try {
-      const data = await redisClient.get(key);
-      return data ? JSON.parse(data) : null;
+      // Redis에서 저장된 유저 데이터를 가져옴
+      const monsterDataString = await redisClient.get(`monster:${monsterId}`);
+      // if (Object.keys(monsterDataString).length === 0) {
+      //   console.log(`유저 정보가 Redis에 존재하지 않습니다: monster:${monsterId}`);
+      //   return null;
+      // }
+
+      const monsterData = JSON.parse(monsterDataString);
+
+      return monsterData;
     } catch (error) {
-      console.error('캐시 가져오기 중 오류 발생:', error);
+      console.error('Redis에서 유저 정보 불러오기 중 오류 발생:', error);
       return null;
     }
   },
 
-  deleteCache: async (key) => {
+  deleteMonster: async (monsterId) => {
     try {
-      await redisClient.del(key);
-      console.log(`캐시 삭제 완료: ${key}`);
+      await redisClient.del(`monster:${monsterId}`);
+
+      console.log(`몬스터 캐시가 삭제되었습니다: monster:${monsterId}`);
+      return null;
     } catch (error) {
-      console.error('캐시 삭제 중 오류 발생:', error);
+      console.error('Redis에서 유저 캐시 삭제 중 오류 발생: ', error);
+      return null;
+    }
+  },
+
+  deleteMonsterCacheMemory: async (socketId) => {
+    try {
+      // Redis에서 모든 몬스터 데이터를 조회
+      const keys = await redisClient.keys('monster:*');
+
+      for (const key of keys) {
+        const monsterDataString = await redisClient.get(key);
+        const monsterData = JSON.parse(monsterDataString);
+
+        // socketId가 일치하는 몬스터를 삭제
+        if (monsterData.socketId === socketId) {
+          await redisClient.del(key);
+          console.log(`몬스터 캐시가 삭제되었습니다: ${key}`);
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Redis에서 몬스터 캐시 삭제 중 오류 발생: ', error);
+      return null;
+    }
+  },
+
+  addUser: async (user) => {
+    try {
+      const userData = {
+        socket: user.socket,
+        userId: user.id,
+        highScore: user.highScore,
+        jwt: user.socket.token,
+      };
+
+      // Redis에 Hash 형식으로 저장
+      await redisClient.hmset(`user:${user.userId}`, userData);
+
+      await redisClient.set(`socket:${user.socket.id}`, user.id);
+      console.log(`유저 정보가 Redis에 저장되었습니다: user:${user.userId}`);
+    } catch (error) {
+      console.error('Redis에 유저 정보 저장 중 오류 발생:', error);
+    }
+  },
+
+  getUser: async (userId) => {
+    try {
+      // Redis에서 저장된 유저 데이터를 가져옴
+      const userData = await redisClient.hgetall(`user:${userId}`);
+      if (Object.keys(userData).length === 0) {
+        console.log(`유저 정보가 Redis에 존재하지 않습니다: user:${userId}`);
+        return null;
+      }
+
+      return userData;
+    } catch (error) {
+      console.error('Redis에서 유저 정보 불러오기 중 오류 발생:', error);
+      return null;
+    }
+  },
+  getUserIdBySocket: async (socket) => {
+    try {
+      const userId = await redisClient.get(`socket:${socket.id}`);
+      if (!userId) {
+        console.log(`socket:${socket.id}에 대한 userId를 찾을 수 없습니다.`);
+        return null;
+      }
+      return userId;
+    } catch (error) {
+      console.error(`socket:${socket.id}에 대한 userId를 찾을 수 없습니다.`);
+      return null;
+    }
+  },
+  getUserBySocket: async (socket) => {
+    try {
+      const userId = getUserIdBySocket(socket);
+
+      // userId로 유저 데이터 불러오기
+      // 이부분 아직테스트 못함 안되면 redisClient.hegetall써야함
+      const userData = getUser(userId);
+      if (Object.keys(userData).length === 0) {
+        console.log(`유저 정보가 Redis에 존재하지 않습니다: user:${userId}`);
+        return null;
+      }
+
+      return userData;
+    } catch (error) {
+      console.error('Redis에서 유저 정보 불러오기 중 오류 발생:', error);
+      return null;
+    }
+  },
+  deleteUserCacheMemory: async (socket) => {
+    try {
+      const userId = getUserIdBySocket(socket);
+
+      Promise.all([redisClient.del(`user:${userId}`), redisClient.del(`socket:${socket.id}`)]);
+
+      console.log(`유저 캐시가 삭제되었습니다: user:${userId} 및 socket:${socket.id}`);
+      return true;
+    } catch (error) {
+      console.error('Redis에서 유저 캐시 삭제 중 오류 발생: ', error);
+      return false;
     }
   },
 

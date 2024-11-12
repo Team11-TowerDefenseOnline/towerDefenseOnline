@@ -1,23 +1,11 @@
 import { getProtoMessages } from '../../init/loadProto.js';
-import { addGameSession, getGameSession } from '../../session/game.session.js';
-import { config } from '../../config/config.js';
-import { gameSessions, matchSessions, userSessions } from '../../session/sessions.js';
-import { createStateSyncPacket, serializer } from '../../utils/notification/game.notification.js';
-import { handleError } from '../../utils/errors/errorHandler.js';
-import CustomError from '../../utils/errors/customError.js';
-import { ErrorCodes } from '../../utils/errors/errorCodes.js';
-import { testConnection } from '../../utils/testConnection/testConnection.js';
+import { addGameSession } from '../../session/game.session.js';
+import { matchSessions } from '../../session/sessions.js';
+import { serializer } from '../../utils/notification/game.notification.js';
 import { getUserBySocket } from '../../session/user.session.js';
 import { addUserInMatchSession } from '../../session/match.session.js';
 import { initAddTower } from '../../session/tower.session.js';
-import IntervalManager from '../../classes/managers/interval.manager.js';
 import stateSyncNotificationHandler from './stateSyncNotification.handler.js';
-
-// message S2CMatchStartNotification {
-//     InitialGameState initialGameState = 1;
-//     GameState playerData = 2;
-//     GameState opponentData = 3;
-// }
 
 let gameSessionIdCount = 1;
 
@@ -26,18 +14,19 @@ let gameSessionIdCount = 1;
 const matchHandler = async ({ socket, payloadData }) => {
   const protoMessages = getProtoMessages();
   const user = getUserBySocket(socket);
+
   // 유저 세션 전체 다들고와서 홀수면 gameSession 만들고 아닐 때는 추가만
   addUserInMatchSession(user);
   const userLength = matchSessions.length;
-  console.log('userLength % 2 = ', userLength % 2);
+
   if (userLength % 2) {
     // 유저가 홀수 일때
     return;
   } else {
     // 유저가 짝수일때
     const users = matchSessions.slice(-2);
-    users[0].socket.id = gameSessionIdCount;
-    users[1].socket.id = gameSessionIdCount;
+    users[0].socket.gameId = gameSessionIdCount;
+    users[1].socket.gameId = gameSessionIdCount;
 
     // 유저를 해당 게임 세션에 넣어줌
     let originGameSessionId = gameSessionIdCount;
@@ -129,27 +118,27 @@ const matchHandler = async ({ socket, payloadData }) => {
         score: 0, // 플레이어의 현재 점수
         monsterPath: [
           // 몬스터 이동 경로
-          { x: 0, y: 400 },
-          { x: 50, y: 400 },
-          { x: 110, y: 400 },
-          { x: 170, y: 400 },
-          { x: 230, y: 400 },
-          { x: 290, y: 400 },
-          { x: 350, y: 400 },
-          { x: 410, y: 400 },
-          { x: 470, y: 400 },
-          { x: 530, y: 400 },
-          { x: 590, y: 400 },
-          { x: 650, y: 400 },
-          { x: 710, y: 400 },
-          { x: 770, y: 400 },
-          { x: 830, y: 400 },
-          { x: 890, y: 400 },
-          { x: 950, y: 400 },
-          { x: 1010, y: 400 },
-          { x: 1070, y: 400 },
-          { x: 1130, y: 400 },
-          { x: 1190, y: 400 },
+          { x: 0, y: 250 },
+          { x: 50, y: 250 },
+          { x: 110, y: 250 },
+          { x: 170, y: 250 },
+          { x: 230, y: 250 },
+          { x: 290, y: 250 },
+          { x: 350, y: 250 },
+          { x: 410, y: 250 },
+          { x: 470, y: 250 },
+          { x: 530, y: 250 },
+          { x: 590, y: 250 },
+          { x: 650, y: 250 },
+          { x: 710, y: 250 },
+          { x: 770, y: 250 },
+          { x: 830, y: 250 },
+          { x: 890, y: 250 },
+          { x: 950, y: 250 },
+          { x: 1010, y: 250 },
+          { x: 1070, y: 250 },
+          { x: 1130, y: 250 },
+          { x: 1190, y: 250 },
         ],
         basePosition: { x: 1370, y: 250 }, // 기지 위치
       };
